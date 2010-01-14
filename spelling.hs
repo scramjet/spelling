@@ -2,23 +2,24 @@ import Data.Char (toLower, ord)
 import Data.Map (Map, fromListWith)
 import Data.Set (Set, fromList)
 import Data.List (inits, tails)
+import Data.List.Split (wordsBy)
 import Text.Regex (mkRegexWithOpts, splitRegex)
 import Test.QuickCheck
- 
-dataFile = "small.txt"
+
+dataFile = "medium.txt"
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 
-words' :: String -> [String]
-words' = splitRegex boundary . map toLower
-  where boundary = mkRegexWithOpts "[^a-z]+" False True
+splitWords :: String -> [String]
+splitWords = wordsBy (\c -> c < 'a' || c > 'z') . map toLower
+
+-- splitWords = splitRegex boundary . map toLower
+--   where boundary = mkRegexWithOpts "[^a-z]+" False True
 
 train :: [String] -> Map String Int
 train = fromListWith (+) . map (\s -> (s, 1))
 
 nwords :: IO (Map String Int)
-nwords = readFile dataFile >>= return . train . words'
-
--- inserts    = [a + c + b     for a, b in splits for c in alphabet]
+nwords = readFile dataFile >>= return . train . splitWords
 
 edits1 :: String -> Set String
 edits1 s = fromList (deletes ++ transposes ++ replaces ++ inserts)
@@ -34,11 +35,11 @@ edits1 s = fromList (deletes ++ transposes ++ replaces ++ inserts)
 --       where
 --         splits' a b@(hd:tl) = (a, b) : splits' (a ++ [hd]) tl
 --         splits' h "" = [(h, "")]
-    
-test :: IO ()
-test = do 
-  text <- readFile "small.txt" 
-  putStrLn $ show $ words' text
+
+main :: IO ()
+main = do 
+    nwords >>= putStrLn . show
+--    readFile dataFile >>= putStrLn . show . splitWords
 
 -- Testing --
 
@@ -46,6 +47,6 @@ instance Arbitrary Char where
   arbitrary     = frequency [(4, choose ('\33', '\128')), (1, return ' ')]
   coarbitrary c = variant (ord c `rem` 4)
 
-prop_words_nospaces s = all (not . elem ' ') (words' s)
+prop_words_nospaces s = all (not . elem ' ') (splitWords s)
 
-prop_words_noempty s = all ((> 0) . length) (words' s)
+prop_words_noempty s = all ((> 0) . length) (splitWords s)
