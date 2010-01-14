@@ -17,22 +17,14 @@ train = fromListWith (+) . map (\s -> (s, 1))
 nwords :: IO (Map String Int)
 nwords = readFile dataFile >>= return . train . words'
 
---    splits =  [("", "the"), ("t", "he"), ("th", "e")]
--- splits (c:cs) = ([c], cs) : splits cs
--- splits c = [(c, "") , ("", c)]
-
 edits1 :: String -> Set String
 edits1 s = fromList (deletes ++ transposes ++ replaces ++ inserts)
   where
-
-    deletes, transposes, replaces, inserts :: [String]
-    deletes = [a ++ bs | (a, _:bs) <- splits s]
+    deletes    = [a ++ bs | (a, _:bs) <- splits s]
     transposes = undefined
-    replaces = undefined
-    inserts = undefined
-
-    splits :: String -> [(String, String)]
-    splits s = zip (inits s) (tails s)
+    replaces   = undefined
+    inserts    = undefined
+    splits s   = zip (inits s) (tails s)
 
 --     splits :: String -> [(String, String)]
 --     splits = splits' ""
