@@ -6,6 +6,7 @@ import Text.Regex (mkRegexWithOpts, splitRegex)
 import Test.QuickCheck
  
 dataFile = "small.txt"
+alphabet = "abcdefghijklmnopqrstuvwxyz"
 
 words' :: String -> [String]
 words' = splitRegex boundary . map toLower
@@ -17,14 +18,16 @@ train = fromListWith (+) . map (\s -> (s, 1))
 nwords :: IO (Map String Int)
 nwords = readFile dataFile >>= return . train . words'
 
+-- inserts    = [a + c + b     for a, b in splits for c in alphabet]
+
 edits1 :: String -> Set String
 edits1 s = fromList (deletes ++ transposes ++ replaces ++ inserts)
   where
-    deletes    = [a ++ bs | (a, _:bs) <- splits s]
-    transposes = undefined
-    replaces   = undefined
-    inserts    = undefined
-    splits s   = zip (inits s) (tails s)
+    deletes    = [a ++ bs | (a, _:bs) <- splits]
+    transposes = [a ++ (b2:b1:bs) | (a, b1:b2:bs) <- splits]
+    replaces   = [a ++ (c:bs) | (a, _:bs) <- splits, c <- alphabet]
+    inserts    = [a ++ (c:b) | (a, b) <- splits, c <- alphabet]
+    splits     = zip (inits s) (tails s)
 
 --     splits :: String -> [(String, String)]
 --     splits = splits' ""
