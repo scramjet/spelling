@@ -1,13 +1,15 @@
 import Data.Char (toLower, ord)
-import Data.Map (Map, fromListWith)
-import Data.Set (Set, fromList)
+import Data.Map (Map, fromListWith, keysSet)
+import Data.Set (Set, fromList, toList, member)
 import Data.List (inits, tails)
 import Data.List.Split (wordsBy)
-import Text.Regex (mkRegexWithOpts, splitRegex)
 import Test.QuickCheck
 
-dataFile = "medium.txt"
+dataFile = "big.txt"
 alphabet = "abcdefghijklmnopqrstuvwxyz"
+
+set :: [String] -> [String]
+set = toList . fromList
 
 splitWords :: String -> [String]
 splitWords = wordsBy (\c -> c < 'a' || c > 'z') . map toLower
@@ -21,14 +23,22 @@ train = fromListWith (+) . map (\s -> (s, 1))
 nwords :: IO (Map String Int)
 nwords = readFile dataFile >>= return . train . splitWords
 
-edits1 :: String -> Set String
-edits1 s = fromList (deletes ++ transposes ++ replaces ++ inserts)
+edits1 :: String -> [String]
+edits1 s = set (deletes ++ transposes ++ replaces ++ inserts)
   where
     deletes    = [a ++ bs | (a, _:bs) <- splits]
     transposes = [a ++ (b2:b1:bs) | (a, b1:b2:bs) <- splits]
     replaces   = [a ++ (c:bs) | (a, _:bs) <- splits, c <- alphabet]
     inserts    = [a ++ (c:b) | (a, b) <- splits, c <- alphabet]
     splits     = zip (inits s) (tails s)
+
+-- def known_edits2(word):
+--     return set(e2 for e1 in edits1(word) for e2 in edits1(e1) if e2 in NWORDS)
+
+known_edits2 :: String -> IO [String]
+known_edits2 s = do
+  knownWords <- nwords >>= return . keysSet
+  return $ set [e2 | e1 <- edits1 s, e2 <- edits1 e1, e2 `member` knownWords]
 
 --     splits :: String -> [(String, String)]
 --     splits = splits' ""
@@ -38,7 +48,7 @@ edits1 s = fromList (deletes ++ transposes ++ replaces ++ inserts)
 
 main :: IO ()
 main = do 
-    nwords >>= putStrLn . show
+  nwords >>= putStrLn . show
 --    readFile dataFile >>= putStrLn . show . splitWords
 
 -- Testing --
