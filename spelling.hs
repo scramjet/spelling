@@ -6,7 +6,8 @@ import Data.List (inits, tails)
 import Data.List.Split (wordsBy)
 import Data.Maybe (fromMaybe)
 import Test.QuickCheck
-import Control.Monad (liftM)
+import Control.Monad (mapM, liftM)
+import System.Environment (getArgs, withArgs)
 
 dataFile = "big.txt"
 alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -76,8 +77,11 @@ correct word = do
 
 main :: IO ()
 main = do 
-  nwords >>= putStrLn . show
---    readFile dataFile >>= putStrLn . show . splitWords
+  args <- getArgs
+  mapM_ (\word -> correct word >>= putStrLn) args
+
+--  nwords >>= putStrLn . show
+--  readFile dataFile >>= putStrLn . show . splitWords
 
 -- Testing --
 
