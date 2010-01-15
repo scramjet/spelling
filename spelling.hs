@@ -1,9 +1,12 @@
 import Data.Char (toLower, ord)
 import Data.Map (Map, fromListWith, keysSet)
-import Data.Set (Set, fromList, toList, member)
+import qualified Data.Map as Map (fromList, lookup)
+import Data.Set (Set, fromList, toList, member, union, fold)
 import Data.List (inits, tails)
 import Data.List.Split (wordsBy)
+import Data.Maybe (fromMaybe)
 import Test.QuickCheck
+import Control.Monad (liftM)
 
 dataFile = "big.txt"
 alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -23,8 +26,8 @@ train = fromListWith (+) . map (\s -> (s, 1))
 nwords :: IO (Map String Int)
 nwords = readFile dataFile >>= return . train . splitWords
 
-edits1 :: String -> [String]
-edits1 s = set (deletes ++ transposes ++ replaces ++ inserts)
+edits1 :: String -> Set String
+edits1 s = fromList (deletes ++ transposes ++ replaces ++ inserts)
   where
     deletes    = [a ++ bs | (a, _:bs) <- splits]
     transposes = [a ++ (b2:b1:bs) | (a, b1:b2:bs) <- splits]
@@ -32,19 +35,44 @@ edits1 s = set (deletes ++ transposes ++ replaces ++ inserts)
     inserts    = [a ++ (c:b) | (a, b) <- splits, c <- alphabet]
     splits     = zip (inits s) (tails s)
 
--- def known_edits2(word):
---     return set(e2 for e1 in edits1(word) for e2 in edits1(e1) if e2 in NWORDS)
-
-known_edits2 :: String -> IO [String]
-known_edits2 s = do
-  knownWords <- nwords >>= return . keysSet
-  return $ set [e2 | e1 <- edits1 s, e2 <- edits1 e1, e2 `member` knownWords]
-
 --     splits :: String -> [(String, String)]
 --     splits = splits' ""
 --       where
 --         splits' a b@(hd:tl) = (a, b) : splits' (a ++ [hd]) tl
 --         splits' h "" = [(h, "")]
+
+known_edits2 :: String -> IO (Set String)
+known_edits2 s = do
+  let edits = toList . edits1
+  knownWords <- nwords >>= return . keysSet
+  return $ 
+    fromList [e2 | e1 <- edits s, e2 <- edits e1, e2 `member` knownWords]
+
+known :: [String] -> IO (Set String)
+known ws = do
+  knownWords <- nwords >>= return . keysSet
+  return $ fromList [w | w <- ws, w `member` knownWords]
+
+correct :: String -> IO String
+correct word = do
+  knownWords <- nwords
+  first <- known [word]
+  second <- known $ toList $ edits1 word
+  third <- known_edits2 word
+  candidates <- return $ first `union` second `union` third
+
+  return $ maxWord candidates knownWords
+  where
+    maxWord :: Set String -> Map String Int -> String
+    maxWord wordSet wordCount= fst $ fold (max wordCount) ("", 0) wordSet
+    max :: Map String Int -> String -> (String, Int) -> (String, Int)
+    max wordCount word m@(maxWord, maxCount) = do
+      let count = fromMaybe 1 (Map.lookup word wordCount)
+      if count > maxCount then (word, count) else m
+
+-- def correct(word):
+--     candidates = known([word]) or known(edits1(word)) or known_edits2(word) or [word]
+--     return max(candidates, key=NWORDS.get)
 
 main :: IO ()
 main = do 
