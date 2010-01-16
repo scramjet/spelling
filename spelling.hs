@@ -65,11 +65,13 @@ correct word = do
   return $ maxWord candidates knownWords
   where
     maxWord :: Set String -> Map String Int -> String
-    maxWord wordSet wordCount= fst $ fold (max wordCount) ("", 0) wordSet
+    maxWord candidates wordCounts = 
+      fst $ fold (max wordCounts) ("", 0) candidates
+
     max :: Map String Int -> String -> (String, Int) -> (String, Int)
-    max wordCount word m@(maxWord, maxCount) = do
-      let count = fromMaybe 1 (Map.lookup word wordCount)
+    max wordCounts word m@(maxWord, maxCount) =
       if count > maxCount then (word, count) else m
+      where count = fromMaybe 1 (Map.lookup word wordCounts)
 
 -- def correct(word):
 --     candidates = known([word]) or known(edits1(word)) or known_edits2(word) or [word]
