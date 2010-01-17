@@ -1,3 +1,5 @@
+{-# LANGUAGE BangPatterns #-}
+
 import Data.Char (toLower, ord)
 import Data.Map (Map, fromListWith, keysSet)
 import qualified Data.Map as Map (fromList, lookup)
@@ -5,9 +7,9 @@ import Data.Set (Set, fromList, toList, member, union, fold)
 import Data.List (inits, tails)
 import Data.List.Split (wordsBy)
 import Data.Maybe (fromMaybe)
-import Test.QuickCheck
 import Control.Monad (mapM, liftM)
 import System.Environment (getArgs, withArgs)
+-- import Test.QuickCheck
 
 dataFile = "big.txt"
 alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -87,10 +89,10 @@ main = do
 
 -- Testing --
 
-instance Arbitrary Char where
-  arbitrary     = frequency [(4, choose ('\33', '\128')), (1, return ' ')]
-  coarbitrary c = variant (ord c `rem` 4)
+-- instance Arbitrary Char where
+--   arbitrary     = frequency [(4, choose ('\33', '\128')), (1, return ' ')]
+--   coarbitrary c = variant (ord c `rem` 4)
 
-prop_words_nospaces s = all (not . elem ' ') (splitWords s)
+-- prop_words_nospaces s = all (not . elem ' ') (splitWords s)
 
-prop_words_noempty s = all ((> 0) . length) (splitWords s)
+-- prop_words_noempty s = all ((> 0) . length) (splitWords s)
