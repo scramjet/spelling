@@ -35,6 +35,7 @@ edits1 s = fromList (deletes ++ transposes ++ replaces ++ inserts)
 correct :: Map String Int -> String -> String
 correct wordCounts word = maxWordCount candidates
   where
+    candidates :: Set String
     candidates = 
       known [word] `union` (known $ edits word) `union` known_edits2 word
 
