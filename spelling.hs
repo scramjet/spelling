@@ -33,7 +33,7 @@ edits1 s = fromList (deletes ++ transposes ++ replaces ++ inserts)
     splits     = zip (inits s) (tails s)
 
 correct :: Map String Int -> String -> String
-correct wordCounts word = maxWordCount candidates
+correct wordCounts word = fst $ fold maxCount ("?", 0) candidates
   where
     candidates :: Set String
     candidates = 
@@ -52,9 +52,6 @@ correct wordCounts word = maxWordCount candidates
     known :: [String] -> Set String
     known ws = fromList [w | w <- ws, w `member` allWords]
     
-    maxWordCount :: Set String -> String
-    maxWordCount candidates = fst $ fold maxCount ("?", 0) candidates
-
     maxCount :: String -> (String, Int) -> (String, Int)
     maxCount word current@(_, currentMax) 
       | count > currentMax = (word, count)
@@ -74,9 +71,6 @@ main = do
     correctWord :: (Map String Int) -> String -> IO ()
     correctWord knownWords word = do
       (return $ correct knownWords word) >>= putStrLn
-
---  nwords >>= putStrLn . show
---  readFile dataFile >>= putStrLn . show . splitWords
 
 -- Testing --
 
