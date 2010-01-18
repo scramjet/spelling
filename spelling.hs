@@ -52,8 +52,7 @@ correct wordCounts word = maxWordCount candidates
     known ws = fromList [w | w <- ws, w `member` allWords]
     
     maxWordCount :: Set String -> String
-    maxWordCount candidates = 
-      fst $ fold maxCount ("", 0) candidates
+    maxWordCount candidates = fst $ fold maxCount ("", 0) candidates
 
     maxCount :: String -> (String, Int) -> (String, Int)
     maxCount word current@(_, currentMax) =
