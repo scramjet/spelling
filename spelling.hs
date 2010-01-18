@@ -37,13 +37,15 @@ correct knownWords word =
   maxWord candidates knownWords
   where
     candidates = 
-      known [word] `union` (known $ toList $ edits1 word) `union` known_edits2 word
+      known [word] `union` (known $ edits word) `union` known_edits2 word
 
     known_edits2 :: String -> Set String
-    known_edits2 s =
-      fromList [e2 | e1 <- edits s, e2 <- edits e1, e2 `member` allWords]
-      where edits = toList . edits1
-            allWords = keysSet knownWords
+    known_edits2 w =
+      fromList [e2 | e1 <- edits w, e2 <- edits e1, e2 `member` allWords]
+      where allWords = keysSet knownWords
+
+    edits :: String -> [String]
+    edits = toList . edits1
 
     known :: [String] -> Set String
     known ws =
