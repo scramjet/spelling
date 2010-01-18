@@ -3,7 +3,7 @@
 import Data.Char (toLower, ord)
 import Data.Map (Map, fromListWith, keysSet)
 import qualified Data.Map as Map (fromList, lookup)
-import Data.Set (Set, fromList, toList, member, union, fold)
+import Data.Set as Set (Set, fromList, toList, member, union, fold, null) 
 import Data.List (inits, tails)
 import Data.List.Split (wordsBy)
 import Data.Maybe (fromMaybe)
@@ -37,7 +37,12 @@ correct wordCounts word = maxWordCount candidates
   where
     candidates :: Set String
     candidates = 
-      known [word] `union` (known $ edits word) `union` known_edits2 word
+      known [word] `or` (known $ edits word) `or` known_edits2 word
+
+    or :: Set String -> Set String -> Set String
+    or s1 s2
+       | Set.null s1 = s2
+       | otherwise   = s1
 
     known_edits2 :: String -> Set String
     known_edits2 w =
