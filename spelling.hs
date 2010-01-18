@@ -32,28 +32,24 @@ edits1 s = fromList (deletes ++ transposes ++ replaces ++ inserts)
     inserts    = [a ++ (c:b) | (a, b) <- splits, c <- alphabet]
     splits     = zip (inits s) (tails s)
 
-known_edits2 :: String -> IO (Set String)
-known_edits2 s = do
-  let edits = toList . edits1
-  knownWords <- nwords >>= return . keysSet
-  return $ 
-    fromList [e2 | e1 <- edits s, e2 <- edits e1, e2 `member` knownWords]
-
-known :: [String] -> IO (Set String)
-known ws = do
-  knownWords <- nwords >>= return . keysSet
-  return $ fromList [w | w <- ws, w `member` knownWords]
-
-correct :: String -> IO String
-correct word = do
-  knownWords <- nwords
-  first <- known [word]
-  second <- known $ toList $ edits1 word
-  third <- known_edits2 word
-  candidates <- return $ first `union` second `union` third
-
-  return $ maxWord candidates knownWords
+correct :: Map String Int -> String -> String
+correct knownWords word =
+  maxWord candidates knownWords
   where
+    candidates = 
+      known [word] `union` (known $ toList $ edits1 word) `union` known_edits2 word
+
+    known_edits2 :: String -> Set String
+    known_edits2 s =
+      fromList [e2 | e1 <- edits s, e2 <- edits e1, e2 `member` allWords]
+      where edits = toList . edits1
+            allWords = keysSet knownWords
+
+    known :: [String] -> Set String
+    known ws =
+      fromList [w | w <- ws, w `member` allWords]
+      where allWords = keysSet knownWords
+
     maxWord :: Set String -> Map String Int -> String
     maxWord candidates wordCounts = 
       fst $ fold (max wordCounts) ("", 0) candidates
@@ -66,7 +62,12 @@ correct word = do
 main :: IO ()
 main = do 
   args <- getArgs
-  mapM_ (\word -> correct word >>= putStrLn) args
+  knownWords <- nwords
+  mapM_ (correctWord knownWords) args
+  where
+    correctWord :: (Map String Int) -> String -> IO ()
+    correctWord knownWords word = do
+      (return $ correct knownWords word) >>= putStrLn
 
 --  nwords >>= putStrLn . show
 --  readFile dataFile >>= putStrLn . show . splitWords
