@@ -23,8 +23,8 @@ train = fromListWith (+) . map (\s -> (s, 1))
 nwords :: IO (Map String Int)
 nwords = readFile dataFile >>= return . train . splitWords
 
-edits1 :: String -> Set String
-edits1 s = fromList (deletes ++ transposes ++ replaces ++ inserts)
+edits1 :: String -> [String]
+edits1 s = toList $ fromList $ deletes ++ transposes ++ replaces ++ inserts
   where
     deletes    = [a ++ bs | (a, _:bs) <- splits]
     transposes = [a ++ (b2:b1:bs) | (a, b1:b2:bs) <- splits]
@@ -37,14 +37,11 @@ correct wordCounts word = fst $ fold maxCount ("?", 0) candidates
   where
     candidates :: Set String
     candidates = 
-      known [word] `or` (known $ edits word) `or` known_edits2 word
+      known [word] `or` (known $ edits1 word) `or` known_edits2 word
 
     known_edits2 :: String -> Set String
     known_edits2 w =
-      fromList [e2 | e1 <- edits w, e2 <- edits e1, e2 `member` allWords]
-
-    edits :: String -> [String]
-    edits = toList . edits1
+      fromList [e2 | e1 <- edits1 w, e2 <- edits1 e1, e2 `member` allWords]
 
     allWords :: Set String
     allWords = keysSet wordCounts
