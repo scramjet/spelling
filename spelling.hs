@@ -42,16 +42,16 @@ correct knownWords word =
     known_edits2 :: String -> Set String
     known_edits2 w =
       fromList [e2 | e1 <- edits w, e2 <- edits e1, e2 `member` allWords]
-      where allWords = keysSet knownWords
 
     edits :: String -> [String]
     edits = toList . edits1
 
-    known :: [String] -> Set String
-    known ws =
-      fromList [w | w <- ws, w `member` allWords]
-      where allWords = keysSet knownWords
+    allWords :: Set String
+    allWords = keysSet knownWords
 
+    known :: [String] -> Set String
+    known ws = fromList [w | w <- ws, w `member` allWords]
+    
     maxWord :: Set String -> Map String Int -> String
     maxWord candidates wordCounts = 
       fst $ fold (max wordCounts) ("", 0) candidates
