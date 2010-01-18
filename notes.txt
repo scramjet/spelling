@@ -1,0 +1,17 @@
+Before opt (6676):
+
+$ time ./spelling teh
+the
+
+real	0m13.788s
+user	0m13.399s
+sys	0m0.373s
+
+After opt (ecf14):
+
+$ time ./spelling teh
+the
+
+real	0m3.522s
+user	0m3.309s
+sys	0m0.212s
