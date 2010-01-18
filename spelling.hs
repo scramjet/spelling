@@ -3,7 +3,7 @@
 import Data.Char (toLower, ord)
 import Data.Map (Map, fromListWith, keysSet)
 import qualified Data.Map as Map (fromList, lookup)
-import Data.Set as Set (Set, fromList, toList, member, union, fold, null) 
+import Data.Set as Set (Set, fromList, toList, member, fold, null) 
 import Data.List (inits, tails)
 import Data.List.Split (wordsBy)
 import Data.Maybe (fromMaybe)
@@ -53,7 +53,7 @@ correct wordCounts word = maxWordCount candidates
     known ws = fromList [w | w <- ws, w `member` allWords]
     
     maxWordCount :: Set String -> String
-    maxWordCount candidates = fst $ fold maxCount ("", 0) candidates
+    maxWordCount candidates = fst $ fold maxCount ("?", 0) candidates
 
     maxCount :: String -> (String, Int) -> (String, Int)
     maxCount word current@(_, currentMax) 
