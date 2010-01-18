@@ -33,7 +33,7 @@ edits1 s = fromList (deletes ++ transposes ++ replaces ++ inserts)
     splits     = zip (inits s) (tails s)
 
 correct :: Map String Int -> String -> String
-correct knownWords word = maxWord candidates knownWords
+correct wordCounts word = maxWordCount candidates
   where
     candidates = 
       known [word] `union` (known $ edits word) `union` known_edits2 word
@@ -46,18 +46,18 @@ correct knownWords word = maxWord candidates knownWords
     edits = toList . edits1
 
     allWords :: Set String
-    allWords = keysSet knownWords
+    allWords = keysSet wordCounts
 
     known :: [String] -> Set String
     known ws = fromList [w | w <- ws, w `member` allWords]
     
-    maxWord :: Set String -> Map String Int -> String
-    maxWord candidates wordCounts = 
-      fst $ fold (max wordCounts) ("", 0) candidates
+    maxWordCount :: Set String -> String
+    maxWordCount candidates = 
+      fst $ fold maxCount ("", 0) candidates
 
-    max :: Map String Int -> String -> (String, Int) -> (String, Int)
-    max wordCounts word m@(maxWord, maxCount) =
-      if count > maxCount then (word, count) else m
+    maxCount :: String -> (String, Int) -> (String, Int)
+    maxCount word current@(_, currentMax) =
+      if count > currentMax then (word, count) else current
       where count = fromMaybe 1 (Map.lookup word wordCounts)
 
 main :: IO ()
