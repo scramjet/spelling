@@ -65,12 +65,14 @@ correct wordCounts word = fst $ fold maxCount ("?", 0) candidates
 main :: IO ()
 main = do 
   args <- getArgs
-  knownWords <- nwords
-  mapM_ (correctWord knownWords) args
+  wordCounts <- nwords
+  mapM_ (printCorrect wordCounts) args
   where
-    correctWord :: (Map String Int) -> String -> IO ()
-    correctWord knownWords word = do
-      (return $ correct knownWords word) >>= putStrLn
+    printCorrect :: (Map String Int) -> String -> IO ()
+    printCorrect wordCounts word = do
+      putStr word
+      putStr " -> "
+      putStrLn $ correct wordCounts word
 
 -- Testing --
 
