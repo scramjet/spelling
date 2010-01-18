@@ -15,3 +15,12 @@ the
 real	0m3.522s
 user	0m3.309s
 sys	0m0.212s
+
+---
+
+$ time python spelling.py
+the
+
+real	0m0.819s
+user	0m0.702s
+sys	0m0.114s
