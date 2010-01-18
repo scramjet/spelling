@@ -14,14 +14,8 @@ import System.Environment (getArgs, withArgs)
 dataFile = "big.txt"
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 
-set :: [String] -> [String]
-set = toList . fromList
-
 splitWords :: String -> [String]
 splitWords = wordsBy (\c -> c < 'a' || c > 'z') . map toLower
-
--- splitWords = splitRegex boundary . map toLower
---   where boundary = mkRegexWithOpts "[^a-z]+" False True
 
 train :: [String] -> Map String Int
 train = fromListWith (+) . map (\s -> (s, 1))
@@ -37,12 +31,6 @@ edits1 s = fromList (deletes ++ transposes ++ replaces ++ inserts)
     replaces   = [a ++ (c:bs) | (a, _:bs) <- splits, c <- alphabet]
     inserts    = [a ++ (c:b) | (a, b) <- splits, c <- alphabet]
     splits     = zip (inits s) (tails s)
-
---     splits :: String -> [(String, String)]
---     splits = splits' ""
---       where
---         splits' a b@(hd:tl) = (a, b) : splits' (a ++ [hd]) tl
---         splits' h "" = [(h, "")]
 
 known_edits2 :: String -> IO (Set String)
 known_edits2 s = do
@@ -74,10 +62,6 @@ correct word = do
     max wordCounts word m@(maxWord, maxCount) =
       if count > maxCount then (word, count) else m
       where count = fromMaybe 1 (Map.lookup word wordCounts)
-
--- def correct(word):
---     candidates = known([word]) or known(edits1(word)) or known_edits2(word) or [word]
---     return max(candidates, key=NWORDS.get)
 
 main :: IO ()
 main = do 
