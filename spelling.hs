@@ -55,8 +55,9 @@ correct wordCounts word = maxWordCount candidates
     maxWordCount candidates = fst $ fold maxCount ("", 0) candidates
 
     maxCount :: String -> (String, Int) -> (String, Int)
-    maxCount word current@(_, currentMax) =
-      if count > currentMax then (word, count) else current
+    maxCount word current@(_, currentMax) 
+      | count > currentMax = (word, count)
+      | otherwise          = current
       where count = fromMaybe 1 (Map.lookup word wordCounts)
 
 main :: IO ()
