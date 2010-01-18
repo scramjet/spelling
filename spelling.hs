@@ -1,14 +1,14 @@
 {-# LANGUAGE BangPatterns #-}
 
-import Data.Char (toLower, ord)
+import Data.Char (toLower)
 import Data.Map (Map, fromListWith, keysSet)
-import qualified Data.Map as Map (fromList, lookup)
+import qualified Data.Map as Map (lookup)
 import Data.Set as Set (Set, fromList, toList, member, fold, null) 
 import Data.List (inits, tails)
 import Data.List.Split (wordsBy)
 import Data.Maybe (fromMaybe)
-import Control.Monad (mapM, liftM)
-import System.Environment (getArgs, withArgs)
+-- import Control.Monad (mapM, liftM)
+import System.Environment (getArgs)
 -- import Test.QuickCheck
 
 dataFile = "big.txt"
