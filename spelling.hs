@@ -39,11 +39,6 @@ correct wordCounts word = maxWordCount candidates
     candidates = 
       known [word] `or` (known $ edits word) `or` known_edits2 word
 
-    or :: Set String -> Set String -> Set String
-    or s1 s2
-       | Set.null s1 = s2
-       | otherwise   = s1
-
     known_edits2 :: String -> Set String
     known_edits2 w =
       fromList [e2 | e1 <- edits w, e2 <- edits e1, e2 `member` allWords]
@@ -65,6 +60,10 @@ correct wordCounts word = maxWordCount candidates
       | count > currentMax = (word, count)
       | otherwise          = current
       where count = fromMaybe 1 (Map.lookup word wordCounts)
+
+    or :: Set String -> Set String -> Set String
+    or a b | Set.null a = b
+           | otherwise  = a
 
 main :: IO ()
 main = do 
