@@ -24,3 +24,9 @@ the
 real	0m0.819s
 user	0m0.702s
 sys	0m0.114s
+
+---
+
+Java (0f14295). nanoseconds (10e-9 seconds)
+
+min = 244,000, max = 83,019,000, avg = 1,083,645, median = 465,000
