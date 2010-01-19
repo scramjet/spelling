@@ -64,7 +64,7 @@ main = do
   wordCounts <- nwords
   mapM_ (printCorrect wordCounts) args
   where
-    printCorrect :: (Map String Int) -> String -> IO ()
+    printCorrect :: Map String Int -> String -> IO ()
     printCorrect wordCounts word = do
       putStr word
       putStr " -> "
