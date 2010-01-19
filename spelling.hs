@@ -65,7 +65,7 @@ main = do
   mapM_ (printCorrect wordCounts) args
   where
     printCorrect :: Map String Int -> String -> IO ()
-    printCorrect wordCounts word = do
+    printCorrect wordCounts word =
       putStrLn $ word ++ " -> " ++ correct wordCounts word
 
 -- Testing --
