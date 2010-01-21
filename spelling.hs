@@ -5,22 +5,29 @@ import Data.Map (Map, fromListWith, keysSet)
 import qualified Data.Map as Map (lookup)
 import Data.Set as Set (Set, fromList, toList, member, fold, null) 
 import Data.List (inits, tails)
-import Data.List.Split (wordsBy)
+-- import Data.List.Split (wordsBy)
 import Data.Maybe (fromMaybe)
 import System.Environment (getArgs)
+import Data.ByteString.Lazy.Char8 as D (ByteString, splitWith, readFile, unpack)
+import Data.Char (chr, ord)
+
 -- import Test.QuickCheck
 
 dataFile = "big.txt"
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 
-splitWords :: String -> [String]
-splitWords = wordsBy (\c -> c < 'a' || c > 'z') . map toLower
+splitWords :: ByteString -> [String]
+splitWords = map toString . splitWith (\c -> c < 'a' || c > 'z')
+  where toString :: ByteString -> String
+--        toString = map toLower . map (chr . fromIntegral)
+        toString = map toLower . unpack
 
 train :: [String] -> Map String Int
 train = fromListWith (+) . map (\s -> (s, 1))
 
 nwords :: IO (Map String Int)
-nwords = readFile dataFile >>= return . train . splitWords
+--nwords = readFile dataFile >>= return . train . splitWords
+nwords = D.readFile dataFile >>= return . train . splitWords
 
 edits1 :: String -> [String]
 edits1 s = toList $ fromList $ deletes ++ transposes ++ replaces ++ inserts
