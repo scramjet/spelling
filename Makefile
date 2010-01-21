@@ -6,5 +6,8 @@ PROF_FLAGS = -prof -auto-all
 
 FLAGS = -O2 -fglasgow-exts -Wall
 
-spelling: spelling.hs
+spelling: spelling.hs Makefile
 	ghc --make $(FLAGS) spelling.hs
+
+clean:
+	rm spelling spelling.o spelling.hi
