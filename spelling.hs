@@ -1,10 +1,10 @@
 {-# LANGUAGE BangPatterns #-}
 
 import Data.Char (toLower)
-import Data.Map (Map, fromListWith, keysSet)
-import qualified Data.Map as Map (lookup)
+import Data.Map (Map, fromListWith, insertWith', keysSet, empty)
+import qualified Data.Map as Map (lookup, empty)
 import Data.Set as Set (Set, fromList, toList, member, fold, null) 
-import Data.List (inits, tails)
+import Data.List (inits, tails, foldl')
 import Data.List.Split (wordsBy)
 import Data.Maybe (fromMaybe)
 import System.Environment (getArgs)
@@ -17,10 +17,11 @@ splitWords :: String -> [String]
 splitWords = wordsBy (\c -> c < 'a' || c > 'z') . map toLower
 
 train :: [String] -> Map String Int
-train = fromListWith (+) . map (\s -> (s, 1))
+train = foldl' updateMap Map.empty 
+  where updateMap model word = insertWith' (+) word 1 model
 
 nwords :: IO (Map String Int)
-nwords = readFile dataFile >>= return . train . splitWords
+nwords = return . train . splitWords =<< readFile dataFile
 
 edits1 :: String -> [String]
 edits1 s = toList $ fromList $ deletes ++ transposes ++ replaces ++ inserts
