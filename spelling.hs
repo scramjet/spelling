@@ -10,17 +10,20 @@ import Data.Maybe (fromMaybe)
 import System.Environment (getArgs)
 -- import Test.QuickCheck
 
+type WordFreq = Map String Int
+type WordSet = Set String
+
 dataFile = "big.txt"
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 
 splitWords :: String -> [String]
 splitWords = wordsBy (\c -> c < 'a' || c > 'z') . map toLower
 
-train :: [String] -> Map String Int
+train :: [String] -> WordFreq
 train = foldl' updateMap Map.empty 
   where updateMap model word = insertWith' (+) word 1 model
 
-nwords :: IO (Map String Int)
+nwords :: IO WordFreq
 nwords = return . train . splitWords =<< readFile dataFile
 
 edits1 :: String -> [String]
@@ -32,21 +35,21 @@ edits1 s = toList $ fromList $ deletes ++ transposes ++ replaces ++ inserts
     inserts    = [a ++ (c:b) | (a, b) <- splits, c <- alphabet]
     splits     = zip (inits s) (tails s)
 
-correct :: Map String Int -> String -> String
+correct :: WordFreq -> String -> String
 correct wordCounts word = fst $ fold maxCount ("?", 0) candidates
   where
-    candidates :: Set String
+    candidates :: WordSet
     candidates = 
       known [word] `or` (known $ edits1 word) `or` known_edits2 word
 
-    known_edits2 :: String -> Set String
+    known_edits2 :: String -> WordSet
     known_edits2 w =
       fromList [w2 | w1 <- edits1 w, w2 <- edits1 w1, w2 `member` allWords]
 
-    allWords :: Set String
+    allWords :: WordSet
     allWords = keysSet wordCounts
 
-    known :: [String] -> Set String
+    known :: [String] -> WordSet
     known ws = fromList [w | w <- ws, w `member` allWords]
     
     maxCount :: String -> (String, Int) -> (String, Int)
@@ -55,7 +58,7 @@ correct wordCounts word = fst $ fold maxCount ("?", 0) candidates
       | otherwise          = current
       where count = fromMaybe 1 (Map.lookup word wordCounts)
 
-    or :: Set String -> Set String -> Set String
+    or :: WordSet -> WordSet -> WordSet
     or a b | Set.null a = b
            | otherwise  = a
 
@@ -65,7 +68,7 @@ main = do
   wordCounts <- nwords
   mapM_ (printCorrect wordCounts) args
   where
-    printCorrect :: Map String Int -> String -> IO ()
+    printCorrect :: WordFreq -> String -> IO ()
     printCorrect wordCounts word =
       putStrLn $ word ++ " -> " ++ correct wordCounts word
 
