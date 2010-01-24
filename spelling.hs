@@ -1,9 +1,9 @@
 {-# LANGUAGE BangPatterns #-}
 
 import Data.Char (toLower)
-import Data.Map (Map, fromListWith, insertWith', keysSet, empty)
-import qualified Data.Map as Map (lookup, empty)
-import Data.Set as Set (Set, fromList, toList, member, fold, null) 
+import Data.Map (Map, fromListWith, member, insertWith', keysSet, empty, findWithDefault)
+import qualified Data.Map as Map (empty)
+import Data.Set as Set (Set, fromList, toList, fold, null) 
 import Data.List (inits, tails, foldl')
 import Data.List.Split (wordsBy)
 import Data.Maybe (fromMaybe)
@@ -23,8 +23,10 @@ train :: [String] -> WordFreq
 train = foldl' updateMap Map.empty 
   where updateMap model word = insertWith' (+) word 1 model
 
+myReadFile = readFile dataFile
+
 nwords :: IO WordFreq
-nwords = return . train . splitWords =<< readFile dataFile
+nwords = return . train . splitWords =<< myReadFile
 
 edits1 :: String -> [String]
 edits1 s = toList $ fromList $ deletes ++ transposes ++ replaces ++ inserts
@@ -44,19 +46,19 @@ correct wordCounts word = fst $ fold maxCount ("?", 0) candidates
 
     known_edits2 :: String -> WordSet
     known_edits2 w =
-      fromList [w2 | w1 <- edits1 w, w2 <- edits1 w1, w2 `member` allWords]
+      fromList [w2 | w1 <- edits1 w, w2 <- edits1 w1, w2 `member` wordCounts]
 
-    allWords :: WordSet
-    allWords = keysSet wordCounts
+--     allWords :: WordSet
+--     allWords = keysSet wordCounts
 
     known :: [String] -> WordSet
-    known ws = fromList [w | w <- ws, w `member` allWords]
+    known ws = fromList [w | w <- ws, w `member` wordCounts]
     
     maxCount :: String -> (String, Int) -> (String, Int)
     maxCount word current@(_, currentMax) 
       | count > currentMax = (word, count)
       | otherwise          = current
-      where count = fromMaybe 1 (Map.lookup word wordCounts)
+      where count = findWithDefault 1 word wordCounts
 
     or :: WordSet -> WordSet -> WordSet
     or a b | Set.null a = b

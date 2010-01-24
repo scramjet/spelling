@@ -25,6 +25,40 @@ real	0m0.819s
 user	0m0.702s
 sys	0m0.114s
 
+On Macbook
+
+$ time ./spelling becuase
+becuase -> because
+
+real	0m4.990s
+user	0m4.220s
+sys	0m0.292s
+[matt@pearl:~/Development/haskell] 
+$ time ./spelling becuase
+becuase -> because
+
+real	0m5.107s
+user	0m4.242s
+sys	0m0.306s
+
+after switch to strict left fold and insertWith' on train:
+
+$ time ./spelling becuase
+becuase -> because
+
+real	0m4.580s
+user	0m3.888s
+sys	0m0.310s
+
+converted to using lists instead of sets for words: worse:
+
+$ time ./spelling becuase
+becuase -> because
+
+real	0m5.643s
+user	0m4.764s
+sys	0m0.304s
+
 ---
 
 Java (0f14295). nanoseconds (10e-9 seconds)

@@ -1,41 +1,36 @@
-	Fri Jan 22 17:00 2010 Time and Allocation Profiling Report  (Final)
+	Sun Jan 24 15:11 2010 Time and Allocation Profiling Report  (Final)
 
 	   spelling +RTS -p -RTS becuase
 
-	total time  =        4.02 secs   (201 ticks @ 20 ms)
-	total alloc = 1,544,257,792 bytes  (excludes profiling overheads)
+	total time  =        3.74 secs   (187 ticks @ 20 ms)
+	total alloc = 1,544,257,772 bytes  (excludes profiling overheads)
 
 COST CENTRE                    MODULE               %time %alloc
 
-train                          Main                  52.7   19.7
-readFile                       Main                  28.9    8.6
-wordsBy                        Main                  10.9   49.5
-toLower                        Main                   7.0   21.8
+train                          Main                  52.9   19.7
+myReadFile                     Main                  35.8    8.6
+splitWords                     Main                  11.2   71.4
 
 
                                                                                                individual    inherited
 COST CENTRE              MODULE                                               no.    entries  %time %alloc   %time %alloc
 
 MAIN                     MAIN                                                   1           0   0.0    0.0   100.0  100.0
-  nwords                 Main                                                 219           0   0.0    0.0     0.0    0.0
-   readFile              Main                                                 220           0   0.0    0.0     0.0    0.0
- CAF                     Main                                                 202          12   0.0    0.0   100.0  100.0
-  alphabet               Main                                                 222           1   0.0    0.0     0.0    0.0
-  splitWords             Main                                                 214           1   0.0    0.0    17.9   71.4
-   wordsBy               Main                                                 216           1  10.9   49.5    10.9   49.5
-   toLower               Main                                                 215           1   7.0   21.8     7.0   21.8
-  train                  Main                                                 213           1  52.7   19.7    52.7   19.7
+  myReadFile             Main                                                 216           0   0.0    0.0     0.0    0.0
+ CAF                     Main                                                 202          13   0.0    0.0   100.0  100.0
+  alphabet               Main                                                 218           1   0.0    0.0     0.0    0.0
+  splitWords             Main                                                 214           1  11.2   71.4    11.2   71.4
+  train                  Main                                                 213           1  52.9   19.7    52.9   19.7
   dataFile               Main                                                 211           1   0.0    0.0     0.0    0.0
-  nwords                 Main                                                 209           1   0.0    0.0    28.9    8.6
-   readFile              Main                                                 210           1  28.9    8.6    28.9    8.6
-  main                   Main                                                 208           1   0.0    0.0     0.5    0.3
-   correct               Main                                                 212           1   0.5    0.3     0.5    0.3
-    edits1               Main                                                 221           1   0.0    0.0     0.0    0.0
+  myReadFile             Main                                                 210           1  35.8    8.6    35.8    8.6
+  nwords                 Main                                                 209           1   0.0    0.0     0.0    0.0
+  main                   Main                                                 208           1   0.0    0.0     0.0    0.3
+   correct               Main                                                 212           1   0.0    0.3     0.0    0.3
+    edits1               Main                                                 217           1   0.0    0.0     0.0    0.0
  CAF                     Data.Typeable                                        200           1   0.0    0.0     0.0    0.0
  CAF                     GHC.IOBase                                           178           3   0.0    0.0     0.0    0.0
  CAF                     Data.HashTable                                       155           2   0.0    0.0     0.0    0.0
  CAF                     GHC.Handle                                           153           5   0.0    0.0     0.0    0.0
-  nwords                 Main                                                 217           0   0.0    0.0     0.0    0.0
-   readFile              Main                                                 218           0   0.0    0.0     0.0    0.0
+  myReadFile             Main                                                 215           0   0.0    0.0     0.0    0.0
  CAF                     GHC.Conc                                             152           1   0.0    0.0     0.0    0.0
  CAF                     System.Environment                                   105           2   0.0    0.0     0.0    0.0

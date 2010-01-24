@@ -1,0 +1,35 @@
+	Sun Jan 24 15:43 2010 Time and Allocation Profiling Report  (Final)
+
+	   spelling_df +RTS -p -RTS becuase
+
+	total time  =        4.26 secs   (213 ticks @ 20 ms)
+	total alloc = 3,803,173,948 bytes  (excludes profiling overheads)
+
+COST CENTRE                    MODULE               %time %alloc
+
+myToLower                      Main                  42.3   47.9
+splitWords                     Main                  36.2   39.8
+train                          Main                  16.4    8.0
+isNogud                        Main                   5.2    4.1
+
+
+                                                                                               individual    inherited
+COST CENTRE              MODULE                                               no.    entries  %time %alloc   %time %alloc
+
+MAIN                     MAIN                                                   1           0   0.0    0.0   100.0  100.0
+  nwords                 Main                                                 218           0   0.0    0.0     0.0    0.0
+ CAF                     Main                                                 204          13   0.0    0.0   100.0  100.0
+  alphabet               Main                                                 221           1   0.0    0.0     0.0    0.0
+  myToLower              Main                                                 217           1  42.3   47.9    42.3   47.9
+  splitWords             Main                                                 216           1  36.2   39.8    41.3   43.9
+   isNogud               Main                                                 219     6488666   5.2    4.1     5.2    4.1
+  train                  Main                                                 215           1  16.4    8.0    16.4    8.0
+  dataFile               Main                                                 212           1   0.0    0.0     0.0    0.0
+  nwords                 Main                                                 211           1   0.0    0.2     0.0    0.2
+  main                   Main                                                 210           1   0.0    0.0     0.0    0.0
+   correct               Main                                                 214           1   0.0    0.0     0.0    0.0
+    edits1               Main                                                 220           1   0.0    0.0     0.0    0.0
+ CAF                     GHC.Handle                                           155           5   0.0    0.0     0.0    0.0
+  nwords                 Main                                                 213           0   0.0    0.0     0.0    0.0
+ CAF                     GHC.Conc                                             154           1   0.0    0.0     0.0    0.0
+ CAF                     System.Environment                                   106           2   0.0    0.0     0.0    0.0
