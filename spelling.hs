@@ -29,7 +29,7 @@ nwords :: IO WordFreq
 nwords = return . train . splitWords =<< myReadFile
 
 edits1 :: String -> [String]
-edits1 s = toList $ fromList $ deletes ++ transposes ++ replaces ++ inserts
+edits1 s = toList . fromList $ deletes ++ transposes ++ replaces ++ inserts
   where
     deletes    = [a ++ bs | (a, _:bs) <- splits]
     transposes = [a ++ (b2:b1:bs) | (a, b1:b2:bs) <- splits]
