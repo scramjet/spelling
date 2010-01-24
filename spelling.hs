@@ -48,9 +48,6 @@ correct wordCounts word = fst $ fold maxCount ("?", 0) candidates
     known_edits2 w =
       fromList [w2 | w1 <- edits1 w, w2 <- edits1 w1, w2 `member` wordCounts]
 
---     allWords :: WordSet
---     allWords = keysSet wordCounts
-
     known :: [String] -> WordSet
     known ws = fromList [w | w <- ws, w `member` wordCounts]
     
