@@ -2,11 +2,12 @@
 
 SOURCES = spelling.hs spelling_df.hs
 FLAGS = -fglasgow-exts -Wall
-OPT_VIA_C = -funbox-strict-fields -fvia-C -optc-O2
-PROF_FLAGS = -prof -auto-all
+CODEGEN_VIA_C = -O2 -funbox-strict-fields -fvia-C -optc-O2
+CODEGEN_VIA_GHC = -O2 -funbox-strict-fields
+PROF = -prof -auto-all
 
 .hs.o:
-	ghc --make $(FLAGS) $(OPT_VIA_C) $<
+	ghc --make $(FLAGS) $(CODEGEN_VIA_GHC) $(PROF) $<
 
 all: compile
 
