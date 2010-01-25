@@ -23,8 +23,10 @@ train = foldl' updateMap Map.empty
  where 
    updateMap model word = insertWith' (+) word 1 model
 
+myReadFile = B.readFile dataFile
+
 nwords :: IO (Map B.ByteString Int)
-nwords = return . train . splitWords =<< B.readFile dataFile
+nwords = return . train . splitWords =<< myReadFile
 
 edits1 :: String -> [String]
 edits1 s = toList . fromList $ deletes ++ transposes ++ replaces ++ inserts
