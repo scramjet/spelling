@@ -7,7 +7,7 @@ CODEGEN_VIA_GHC = -O2 -funbox-strict-fields
 PROF = -prof -auto-all
 
 .hs.o:
-	ghc --make $(FLAGS) $(CODEGEN_VIA_GHC) $(PROF) $<
+	ghc --make $(FLAGS) $(CODEGEN_VIA_GHC) $<
 
 all: compile
 
