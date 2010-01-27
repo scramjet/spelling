@@ -8,6 +8,10 @@ import Data.List (inits, tails, foldl')
 import Data.List.Split (wordsBy)
 import Data.Maybe (fromMaybe)
 import System.Environment (getArgs)
+import Text.Printf
+import Control.Exception
+import System.CPUTime
+
 -- import Test.QuickCheck
 
 type WordFreq = Map String Int
@@ -23,10 +27,8 @@ train :: [String] -> WordFreq
 train = foldl' updateMap Map.empty 
   where updateMap model word = insertWith' (+) word 1 model
 
-myReadFile = readFile dataFile
-
 nwords :: IO WordFreq
-nwords = return . train . splitWords =<< myReadFile
+nwords = return . train . splitWords =<< readFile dataFile
 
 edits1 :: String -> [String]
 edits1 s = toList . fromList $ deletes ++ transposes ++ replaces ++ inserts
@@ -63,13 +65,41 @@ correct wordCounts word = fst $ fold maxCount ("?", 0) candidates
 
 main :: IO ()
 main = do 
+  start <- getCPUTime
   args <- getArgs
   wordCounts <- nwords
   mapM_ (printCorrect wordCounts) args
+  end <- getCPUTime
+  let diff = (fromIntegral (end - start)) / (10^12)
+  printf "Computation time: %0.3f sec\n" (diff :: Double)
   where
     printCorrect :: WordFreq -> String -> IO ()
     printCorrect wordCounts word =
       putStrLn $ word ++ " -> " ++ correct wordCounts word
+
+ 
+-- time :: IO t -> IO t
+-- time a = do
+--     start <- getCPUTime
+--     v <- a
+--     end   <- getCPUTime
+--     let diff = (fromIntegral (end - start)) / (10^12)
+--     printf "Computation time: %0.3f sec\n" (diff :: Double)
+--     return v
+
+-- main :: IO () 
+-- main = do
+--     args <- getArgs        
+--     wordCounts <- nwords
+--     putStrLn "Starting..."
+--     time $! (run wordCounts args) `seq` return ()
+--     putStrLn "Done."
+--     where run wordCounts args = do 
+--           mapM_ (printCorrect wordCounts) args
+--           where
+--             printCorrect :: WordFreq -> String -> IO ()
+--             printCorrect wordCounts word =
+--                 putStrLn $ word ++ " -> " ++ correct wordCounts word
 
 -- Testing --
 
