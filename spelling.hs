@@ -1,66 +1,77 @@
 {-# LANGUAGE BangPatterns #-}
+module Main (main) where
 
+import qualified Data.ByteString.Char8 as B
+import Data.ByteString.Char8 (ByteString, pack, unpack)
+import qualified Data.ByteString as BS
+import Data.Bits
+import Data.Word (Word8)
 import Data.Char (toLower)
-import Data.Map (Map, fromListWith, member, insertWith', keysSet, empty, findWithDefault)
-import qualified Data.Map as Map (empty)
-import Data.Set as Set (Set, fromList, toList, fold, null) 
+import Data.Map (Map, findWithDefault, insertWith', keysSet, empty, member)
+import qualified Data.Map as Map (lookup, empty, size)
+import Data.Set (toList, fromList)
 import Data.List (inits, tails, foldl')
-import Data.List.Split (wordsBy)
-import Data.Maybe (fromMaybe)
 import System.Environment (getArgs)
+import System.CPUTime (getCPUTime)
 import Text.Printf
-import Control.Exception
-import System.CPUTime
 
--- import Test.QuickCheck
-
-type WordFreq = Map String Int
-type WordSet = Set String
+type WordFreq = Map ByteString Int
 
 dataFile = "big.txt"
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 
-splitWords :: String -> [String]
-splitWords = wordsBy (\c -> c < 'a' || c > 'z') . map toLower
+splitWords :: ByteString -> [ByteString]
+splitWords = 
+  filter (not . BS.null) . BS.splitWith notLetter . BS.map mkLower
+  where mkLower :: Word8 -> Word8
+        mkLower x = x .|. 32
 
-train :: [String] -> WordFreq
-train = foldl' updateMap Map.empty 
+        notLetter :: Word8 -> Bool
+        notLetter c = c < 97 || c > 122
+
+train :: [ByteString] -> WordFreq
+train = foldl' updateMap Map.empty
   where updateMap model word = insertWith' (+) word 1 model
 
 nwords :: IO WordFreq
-nwords = return . train . splitWords =<< readFile dataFile
+nwords = (return $!) . train . splitWords =<< B.readFile dataFile
 
 edits1 :: String -> [String]
-edits1 s = toList . fromList $ deletes ++ transposes ++ replaces ++ inserts
-  where
-    deletes    = [a ++ bs | (a, _:bs) <- splits]
-    transposes = [a ++ (b2:b1:bs) | (a, b1:b2:bs) <- splits]
-    replaces   = [a ++ (c:bs) | (a, _:bs) <- splits, c <- alphabet]
-    inserts    = [a ++ (c:b) | (a, b) <- splits, c <- alphabet]
-    splits     = zip (inits s) (tails s)
+edits1 s = deletes ++ transposes ++ replaces ++ inserts
+ where
+   deletes = [a ++ bs | (a, _:bs) <- splits]
+   transposes = [a ++ (b2:b1:bs) | (a, b1:b2:bs) <- splits]
+   replaces = [a ++ (c:bs) | (a, _:bs) <- splits, c <- alphabet]
+   inserts = [a ++ (c:b) | (a, b) <- splits, c <- alphabet]
+   splits = zip (inits s) (tails s)
 
 correct :: WordFreq -> String -> String
-correct wordCounts word = fst $ fold maxCount ("?", 0) candidates
+correct wordCounts word =
+  unpack . fst $ foldl' maxCount (pack "?", 0) candidates
   where
-    candidates :: WordSet
-    candidates = 
-      known [word] `or` (known $ edits1 word) `or` known_edits2 word
+    candidates :: [ByteString]
+    candidates =
+      known [word] `or` ((known e1) `or` known_edits2)
 
-    known_edits2 :: String -> WordSet
-    known_edits2 w =
-      fromList [w2 | w1 <- edits1 w, w2 <- edits1 w1, w2 `member` wordCounts]
+    e1 :: [String]
+    e1 = toList . fromList $ edits1 word
 
-    known :: [String] -> WordSet
-    known ws = fromList [w | w <- ws, w `member` wordCounts]
-    
-    maxCount :: String -> (String, Int) -> (String, Int)
-    maxCount word current@(_, currentMax) 
+    known_edits2 :: [ByteString]
+    known_edits2 =
+      [w3 | w1 <- e1, w2 <- edits1 w1, let w3 = pack w2, 
+                                       w3 `member` wordCounts]
+
+    known :: [String] -> [ByteString]
+    known ws = [w | w <- map pack ws, w `member` wordCounts]
+
+    maxCount :: (ByteString, Int) -> ByteString -> (ByteString, Int)
+    maxCount current@(_, currentMax) word
       | count > currentMax = (word, count)
       | otherwise          = current
       where count = findWithDefault 1 word wordCounts
 
-    or :: WordSet -> WordSet -> WordSet
-    or a b | Set.null a = b
+    or :: [ByteString] -> [ByteString] -> [ByteString]
+    or a b | null a     = b
            | otherwise  = a
 
 main :: IO ()
