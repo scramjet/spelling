@@ -29,4 +29,9 @@ def correct(word):
     candidates = known([word]) or known(edits1(word)) or known_edits2(word) or [word]
     return max(candidates, key=NWORDS.get)
 
-print correct ("becuase")
+def correct_words(words):
+    for word in words:
+        print correct (word)
+
+print correct_words (["becuase", "korrekt", "teh", "helo"])
+
