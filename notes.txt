@@ -1,3 +1,20 @@
+On Mac Pro with 
+
+Java (200 runs, median): 0.047
+Python:                  0.097
+Python:                  0.913 (with startup)
+Haskell (bytestrings):   1.559
+Haskell:                 1.567 (with startup)
+
+Python code: 
+
+t = timeit.Timer ('correct_words (["becuase", "korrekt", "teh", "helo"])', "from __main__ import correct_words")
+min (t.repeat (10 , 1))
+
+time python -m timeit  -r 3 -n 1 -s "from spelling import correct_words"  'correct_words (["becuase", "korrekt", "teh", "helo"])'
+
+----------------------------------------------------------------------
+
 Before opt (6676):
 
 $ time ./spelling teh
