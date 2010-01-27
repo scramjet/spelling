@@ -1,6 +1,7 @@
 On Mac Pro with 
 
 Java (200 runs, min):    0.047
+Java:                    2.322 (with startup, user 3.452!)
 Python:                  0.097
 Python:                  0.913 (with startup)
 Haskell (bytestrings):   1.559
