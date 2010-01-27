@@ -6,9 +6,8 @@ import Data.ByteString.Char8 (ByteString, pack, unpack)
 import qualified Data.ByteString as BS
 import Data.Bits
 import Data.Word (Word8)
-import Data.Char (toLower)
-import Data.Map (Map, findWithDefault, insertWith', keysSet, empty, member)
-import qualified Data.Map as Map (lookup, empty, size)
+import Data.Map (Map, findWithDefault, insertWith', empty, member)
+import qualified Data.Map as Map (empty)
 import Data.Set (toList, fromList)
 import Data.List (inits, tails, foldl')
 import System.Environment (getArgs)
