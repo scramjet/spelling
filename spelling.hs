@@ -6,7 +6,8 @@ import Data.ByteString.Char8 (ByteString, pack, unpack)
 import qualified Data.ByteString as BS
 import Data.Bits
 import Data.Word (Word8)
-import Data.Map (Map, findWithDefault, insertWith', empty, member)
+import Data.Maybe
+-- import Data.Map (Map, findWithDefault, insertWith', empty, member)
 import qualified Data.Map as Map (empty)
 import Data.Set (toList, fromList)
 import Data.List (inits, tails, foldl')
@@ -14,7 +15,11 @@ import System.Environment (getArgs)
 import System.CPUTime (getCPUTime)
 import Text.Printf
 
-type WordFreq = Map ByteString Int
+import qualified Data.Trie as T (Trie, fromList, alterBy, empty, member)
+import Data.Trie (member)
+import Data.Trie.Convenience (lookupWithDefault)
+
+type WordFreq = T.Trie Int
 
 dataFile = "big.txt"
 alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -29,8 +34,14 @@ splitWords =
         notLetter c = c < 97 || c > 122
 
 train :: [ByteString] -> WordFreq
-train = foldl' updateMap Map.empty
-  where updateMap model word = insertWith' (+) word 1 model
+-- train = foldl' updateMap Map.empty
+--   where updateMap model word = insertWith' (+) word 1 model
+
+train = foldl' updateTrie T.empty
+  where updateTrie model word = T.alterBy resolve word 1 model
+        resolve :: ByteString -> Int -> Maybe Int -> Maybe Int
+        resolve key _ (Just old) = Just (old + 1)
+        resolve key _ Nothing = Just 1
 
 nwords :: IO WordFreq
 nwords = (return $!) . train . splitWords =<< B.readFile dataFile
@@ -67,7 +78,7 @@ correct wordCounts word =
     maxCount current@(_, currentMax) word
       | count > currentMax = (word, count)
       | otherwise          = current
-      where count = findWithDefault 1 word wordCounts
+      where count = lookupWithDefault 1 word wordCounts
 
     or :: [ByteString] -> [ByteString] -> [ByteString]
     or a b | null a     = b
