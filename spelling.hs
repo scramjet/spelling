@@ -17,7 +17,7 @@ import Text.Printf
 
 import qualified Data.Trie as T (Trie, fromList, alterBy, empty, member)
 import Data.Trie (member)
-import Data.Trie.Convenience (lookupWithDefault)
+import Data.Trie.Convenience (lookupWithDefault, insertWith)
 
 type WordFreq = T.Trie Int
 
@@ -40,8 +40,8 @@ train :: [ByteString] -> WordFreq
 train = foldl' updateTrie T.empty
   where updateTrie model word = T.alterBy resolve word 1 model
         resolve :: ByteString -> Int -> Maybe Int -> Maybe Int
-        resolve key _ (Just old) = Just (old + 1)
-        resolve key _ Nothing = Just 1
+        resolve !key _ (Just !old) = Just (((+) $!) old 1)
+        resolve !key _ Nothing = Just 1
 
 nwords :: IO WordFreq
 nwords = (return $!) . train . splitWords =<< B.readFile dataFile
