@@ -11,7 +11,7 @@ PROF = -prof -auto-all
 
 all: compile
 
-compile: ${SOURCES:%.hs=%.o} 
+compile: ${SOURCES:%.hs=%.o}
 
 clean:
 	rm spelling spelling.o spelling.hi spelling_df spelling_df.o spelling_df.hi

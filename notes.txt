@@ -6,6 +6,8 @@ Python:                  0.097
 Python:                  0.913 (with startup)
 Haskell (bytestrings):   1.559
 Haskell:                 1.567 (with startup)
+Haskell (trie)           2.075 (with startup)
+Haskell (trie)           1.798 (with ! on updateTrie and $!)
 
 Python code: 
 
