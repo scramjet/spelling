@@ -11,8 +11,7 @@ cellState :: Board -> Point -> Bool
 cellState board point = point `member` board
 
 nextBoard :: Board -> Board
-nextBoard board = 
-  fromList $ [point | point <- points, isLive point]
+nextBoard board = makeBoard $ [point | point <- points, isLive point]
   where
     points = [(x, y) | x <- [0..boardWidth], y <- [0..boardHeight]]
 
@@ -20,15 +19,14 @@ nextBoard board =
 
     neighbourCount point = sum . liveNeighbours $ point
 
-    countLive True acc = acc + 1
-    countLive False acc = acc
-
     liveNeighbours point = 
-        map ((\b -> if b then 1 else 0) . cellState board) $ neighbours point
+      map (bool2int . cellState board) $ neighbours point
 
     neighbours :: Point -> [Point]
     neighbours (x, y) = 
       [(x + dx, y + dy) | dx <- [-1..1], dy <- [-1..1], dx /= 0, dy /= 0]
+
+    bool2int b = if b then 1 else 0
 
 nextState :: Bool -> Int -> Bool
 nextState True neighbours  | neighbours < 2  = False
@@ -37,8 +35,8 @@ nextState True neighbours  | neighbours < 2  = False
 nextState False neighbours | neighbours == 3 = True
                            | otherwise       = False
 
-board :: [Point] -> Board
-board points = fromList points
+makeBoard :: [Point] -> Board
+makeBoard points = fromList points
 
 printBoard :: Board -> String
 printBoard = undefined
