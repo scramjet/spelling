@@ -10,7 +10,6 @@ import Data.Map (Map, findWithDefault, insertWith', empty, member)
 import qualified Data.Map as Map (empty)
 import Data.Set (toList, fromList)
 import Data.List (inits, tails, foldl')
-import System.Environment (getArgs)
 import System.CPUTime (getCPUTime)
 import Text.Printf
 
@@ -76,17 +75,11 @@ correct wordCounts word =
 main :: IO ()
 main = do 
   start <- getCPUTime
-  args <- getArgs
   wordCounts <- nwords
-  mapM_ (printCorrect wordCounts) args
+  interact (unlines . map (correct wordCounts) . words)
   end <- getCPUTime
   let diff = (fromIntegral (end - start)) / (10^12)
   printf "Computation time: %0.3f sec\n" (diff :: Double)
-  where
-    printCorrect :: WordFreq -> String -> IO ()
-    printCorrect wordCounts word =
-      putStrLn $ word ++ " -> " ++ correct wordCounts word
-
  
 -- time :: IO t -> IO t
 -- time a = do
