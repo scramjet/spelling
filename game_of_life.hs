@@ -7,19 +7,19 @@ type Board = Set Point
 boardWidth  = 20
 boardHeight = 20
 
-cellState :: Board -> Point -> Bool
-cellState board point = point `member` board
+cellLive :: Board -> Point -> Bool
+cellLive board point = point `member` board
 
 nextBoard :: Board -> Board
-nextBoard board = makeBoard $ [point | point <- points, isLive point]
+nextBoard board = makeBoard [point | point <- points, isLive point]
   where
     points = [(x, y) | x <- [0..boardWidth], y <- [0..boardHeight]]
 
-    isLive point = nextState (cellState board point) (neighbourCount point)
+    isLive point = nextState (cellLive board point) (neighbourCount point)
 
     neighbourCount = sum . liveNeighbours
 
-    liveNeighbours = map (bool2int . cellState board) . neighbours
+    liveNeighbours = map (bool2int . cellLive board) . neighbours
 
     neighbours :: Point -> [Point]
     neighbours (x, y) = [(x + dx, y + dy) | dx <- [-1, 1], dy <- [-1, 1]]
