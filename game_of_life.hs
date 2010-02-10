@@ -17,14 +17,12 @@ nextBoard board = makeBoard $ [point | point <- points, isLive point]
 
     isLive point = nextState (cellState board point) (neighbourCount point)
 
-    neighbourCount point = sum . liveNeighbours $ point
+    neighbourCount = sum . liveNeighbours
 
-    liveNeighbours point = 
-      map (bool2int . cellState board) $ neighbours point
+    liveNeighbours = map (bool2int . cellState board) . neighbours
 
     neighbours :: Point -> [Point]
-    neighbours (x, y) = 
-      [(x + dx, y + dy) | dx <- [-1..1], dy <- [-1..1], dx /= 0, dy /= 0]
+    neighbours (x, y) = [(x + dx, y + dy) | dx <- [-1, 1], dy <- [-1, 1]]
 
     bool2int b = if b then 1 else 0
 
