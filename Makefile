@@ -1,6 +1,6 @@
 .SUFFIXES: .hs .o
 
-SOURCES = spelling.hs spelling_df.hs
+SOURCES = spelling.hs spelling_df.hs game_of_life.hs
 FLAGS = -fglasgow-exts -Wall
 CODEGEN_VIA_C = -O2 -funbox-strict-fields -fvia-C -optc-O2
 CODEGEN_VIA_GHC = -O2 -funbox-strict-fields
