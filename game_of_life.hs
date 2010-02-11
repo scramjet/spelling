@@ -18,42 +18,6 @@ boardHeight = 10
 xCoords = [0..boardWidth - 1]
 yCoords = [0..boardHeight - 1]
 
-board1 = 
-  matrix2Board ["X XX X XXX",
-                "X X X X X ",
-                "X X   X X ",
-                "X X X X X ",
-                "X X X  XX ",
-                "X XX    X ",
-                "X X X   X ",
-                "X   X X X ",
-                "X X   X X ",
-                "X X X   X "]
-
-boardOscillators = 
-  matrix2Board [" X        ",
-                " X        ",
-                " X        ",
-                "          ",
-                "          ",
-                "          ",
-                "    XXX   ",
-                "  XXX     ",
-                "          ",
-                "          "]
-
-boardGliders = 
-  matrix2Board ["X         ",
-                " XX       ",
-                "XX        ",
-                "          ",
-                " X        ",
-                " XX       ",
-                "X X       ",
-                "          ",
-                "          ",
-                "          "]
-
 allPoints :: [Point]
 allPoints = [(x, y) | y <- yCoords, x <- xCoords]
 
@@ -105,7 +69,6 @@ printGames board = forM_ (games board) printFrame
 
 printCurses :: Board -> IO ()
 printCurses startBoard = do
---  resetParams
   forM_ (games startBoard) showFrame
   where 
     showFrame board = do
@@ -126,8 +89,68 @@ printCurses startBoard = do
 
     wait = threadDelay (2 * 100000) -- or getCh
 
+board1 = 
+  matrix2Board ["X XX X XXX",
+                "X X X X X ",
+                "X X   X X ",
+                "X X X X X ",
+                "X X X  XX ",
+                "X XX    X ",
+                "X X X   X ",
+                "X   X X X ",
+                "X X   X X ",
+                "X X X   X "]
+
+boardOscillators = 
+  matrix2Board [" X        ",
+                " X        ",
+                " X        ",
+                "          ",
+                "          ",
+                "          ",
+                "    XXX   ",
+                "  XXX     ",
+                "          ",
+                "          "]
+
+boardGliders = 
+  matrix2Board ["X         ",
+                " XX       ",
+                "XX        ",
+                "          ",
+                " X        ",
+                " XX       ",
+                "X X       ",
+                "          ",
+                "          ",
+                "          "]
+
+boardQueenBee = 
+  matrix2Board ["          ",
+                "XX        ",
+                "  X       ",
+                "   X      ",
+                "   X      ",
+                "   X      ",
+                "  X       ",
+                "XX        ",
+                "          ",
+                "          "]
+boardOscillators2 = 
+  matrix2Board ["          ",
+                "XXXXXXXXXX",
+                "          ",
+                "          ",
+                "    X     ",
+                "   XXX    ",
+                "   X X    ",
+                "   XXX    ",
+                "    X     ",
+                "          "]
+
+
 main :: IO ()
 main = do
   initCurses (return ())
-  printCurses boardOscillators
+  printCurses boardQueenBee
   endWin
