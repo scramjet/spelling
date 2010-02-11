@@ -96,25 +96,25 @@ main :: IO ()
 --- main = printGames board1
 main = do
   initCurses (return ())
-  printCurses
+  printCurses board1
   endWin
 
-printCurses :: IO ()
-printCurses = do
+printCurses :: Board -> IO ()
+printCurses startBoard = do
   resetParams
-  mapM_ showFrame (games board1)
+  mapM_ showFrame $ games startBoard
   where 
     showFrame :: Board -> IO ()
     showFrame board = do
       let m = board2Matrix board
-      wMove stdScr 0 0
+      wMove stdScr 2 5
       mapM_ showLine m
       refresh
-      wMove stdScr 0 0
+      wMove stdScr 2 5
       threadDelay (5 * 100000)
     showLine :: String -> IO ()
     showLine line = do
       (y, x) <- getYX stdScr
-      cStr <- (newCString line)
-      waddnstr stdScr cStr (fromIntegral (length line))
-      wMove stdScr (y + 1) 0
+      cStr <- newCString line
+      waddnstr stdScr cStr $ fromIntegral $ length line
+      wMove stdScr (y + 1) 5
