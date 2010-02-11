@@ -9,8 +9,8 @@ type Board = Set Point
 boardWidth  = 10
 boardHeight = 10
 
-xCoords = [0 .. boardWidth - 1]
-yCoords = [0 .. boardHeight - 1]
+xCoords = [0..boardWidth - 1]
+yCoords = [0..boardHeight - 1]
 
 board1 = 
   matrix2Board ["X XX X XXX",
@@ -41,12 +41,6 @@ allPoints = [(x, y) | y <- xCoords, x <- yCoords]
 
 makeBoard :: [Point] -> Board
 makeBoard points = fromList points
-
-fullBoard :: Board
-fullBoard = makeBoard [(x, y) | x <- xCoords, y <- yCoords]
-
-emptyBoard :: Board
-emptyBoard = empty
 
 isCellLive :: Board -> Point -> Bool
 isCellLive board point = point `member` board
