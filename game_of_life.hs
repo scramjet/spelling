@@ -61,7 +61,7 @@ nextBoard board = makeBoard [point | point <- allPoints, succIsLive point]
       length . filter id . map (isCellLive board) . neighbouringPts
 
     neighbouringPts (x, y) = 
-      [(x + dx, y + dy) | dx <- [-1..1], dy <- [-1..1], dx /= dy || dx > 0]
+      [(x + dx, y + dy) | dx <- [-1..1], dy <- [-1..1], dx /= dy || dx /= 0]
 
 nextCell :: Bool -> Int -> Bool
 nextCell True neighbours  | neighbours < 2  = False
