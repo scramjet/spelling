@@ -3,9 +3,10 @@
 import Prelude hiding (null)
 import Data.Set (Set, member, fromList, null, empty)
 import Foreign.C.String (newCString)
+import Foreign.Marshal.Alloc (free)
 import Control.Concurrent (threadDelay)
 import UI.Nanocurses.Curses (initCurses, refresh, wMove, stdScr, 
-                             waddnstr, getYX, endWin, resetParams)
+                             waddnstr, getYX, endWin, resetParams, getCh)
 
 type Point = (Int, Int)
 type Board = Set Point
@@ -92,29 +93,33 @@ printGames board = mapM_ printFrame $ games board
         printBoard b
         putStrLn $ replicate boardWidth '*'
 
-main :: IO ()
---- main = printGames board1
-main = do
-  initCurses (return ())
-  printCurses board1
-  endWin
-
 printCurses :: Board -> IO ()
 printCurses startBoard = do
   resetParams
   mapM_ showFrame $ games startBoard
   where 
-    showFrame :: Board -> IO ()
     showFrame board = do
-      let m = board2Matrix board
       wMove stdScr 2 5
-      mapM_ showLine m
+      mapM_ showLine (board2Matrix board)
       refresh
-      wMove stdScr 2 5
-      threadDelay (5 * 100000)
-    showLine :: String -> IO ()
+      wait
+
     showLine line = do
       (y, x) <- getYX stdScr
       cStr <- newCString line
-      waddnstr stdScr cStr $ fromIntegral $ length line
+      showStr line
       wMove stdScr (y + 1) 5
+
+    wait = threadDelay (5 * 100000)
+--    wait = getCh
+
+    showStr str = do
+      cStr <- newCString str
+      waddnstr stdScr cStr (fromIntegral $ length str)
+      free cStr
+
+main :: IO ()
+main = do
+  initCurses (return ())
+  printCurses board1
+  endWin
