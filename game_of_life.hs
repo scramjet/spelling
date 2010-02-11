@@ -106,7 +106,6 @@ printCurses startBoard = do
 
     showLine line = do
       (y, x) <- getYX stdScr
-      cStr <- newCString line
       showStr line
       wMove stdScr (y + 1) 5
 
