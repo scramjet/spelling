@@ -30,14 +30,26 @@ board1 =
                 "X X   X X ",
                 "X X X   X "]
 
-board'glider = 
-  matrix2Board ["          ",
-                "  X       ",
-                "   XX     ",
-                "  XX      ",
+boardOscillators = 
+  matrix2Board [" X        ",
+                " X        ",
+                " X        ",
                 "          ",
                 "          ",
                 "          ",
+                "    XXX   ",
+                "  XXX     ",
+                "          ",
+                "          "]
+
+boardGliders = 
+  matrix2Board ["X         ",
+                " XX       ",
+                "XX        ",
+                "          ",
+                " X        ",
+                " XX       ",
+                "X X       ",
                 "          ",
                 "          ",
                 "          "]
@@ -87,14 +99,13 @@ printBoard board = mapM_ putStrLn $ board2Matrix board
 
 printGames :: Board -> IO ()
 printGames board = forM_ (games board) printFrame
-    where 
-      printFrame board = do
-        printBoard board
-        putStrLn $ replicate boardWidth '*'
+  where printFrame board = do
+          printBoard board
+          putStrLn $ replicate boardWidth '*'
 
 printCurses :: Board -> IO ()
 printCurses startBoard = do
-  resetParams
+--  resetParams
   forM_ (games startBoard) showFrame
   where 
     showFrame board = do
@@ -108,16 +119,15 @@ printCurses startBoard = do
       showStr line
       wMove stdScr (y + 1) 5
 
-    wait = threadDelay (2 * 100000)
---    wait = getCh
-
     showStr str = do
       cStr <- newCString str
       waddnstr stdScr cStr (fromIntegral $ length str)
       free cStr
 
+    wait = threadDelay (2 * 100000) -- or getCh
+
 main :: IO ()
 main = do
   initCurses (return ())
-  printCurses board1
+  printCurses boardOscillators
   endWin
