@@ -48,20 +48,20 @@ fullBoard = makeBoard [(x, y) | x <- xCoords, y <- yCoords]
 emptyBoard :: Board
 emptyBoard = empty
 
-cellLive :: Board -> Point -> Bool
-cellLive board point = point `member` board
+isCellLive :: Board -> Point -> Bool
+isCellLive board point = point `member` board
 
 nextBoard :: Board -> Board
-nextBoard board = makeBoard [point | point <- allPoints, isLive point]
+nextBoard board = makeBoard [point | point <- allPoints, succIsLive point]
   where
-    isLive point = nextCell (cellLive board point) (liveNeighbours point)
+    succIsLive point = 
+      nextCell (isCellLive board point) (liveNeighbours point)
 
-    liveNeighbours = sum . map (bool2int . cellLive board) . neighbourPoints
+    liveNeighbours = 
+      length. filter id . map (isCellLive board) . neighbouringPts
 
-    neighbourPoints (x, y) = 
+    neighbouringPts (x, y) = 
       [(x + dx, y + dy) | dx <- [-1..1], dy <- [-1..1], dx /= dy || dx > 0]
-
-    bool2int b = if b then 1 else 0
 
 nextCell :: Bool -> Int -> Bool
 nextCell True neighbours  | neighbours < 2  = False
@@ -76,7 +76,7 @@ games board | null board = []
 
 board2Matrix :: Board -> [[Char]]
 board2Matrix board = [[cell (x, y) | x <- xCoords] | y <- yCoords]
-  where cell p = if cellLive board p then 'X' else ' '
+  where cell p = if isCellLive board p then 'X' else ' '
 
 matrix2Board :: [[Char]] -> Board
 matrix2Board m = 
