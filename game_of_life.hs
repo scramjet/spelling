@@ -42,7 +42,7 @@ board'glider =
                 "          "]
 
 allPoints :: [Point]
-allPoints = [(x, y) | y <- xCoords, x <- yCoords]
+allPoints = [(x, y) | y <- yCoords, x <- xCoords]
 
 makeBoard :: [Point] -> Board
 makeBoard points = fromList points
@@ -57,7 +57,7 @@ nextBoard board = makeBoard [point | point <- allPoints, succIsLive point]
       nextCell (isCellLive board point) (liveNeighbours point)
 
     liveNeighbours = 
-      length. filter id . map (isCellLive board) . neighbouringPts
+      length . filter id . map (isCellLive board) . neighbouringPts
 
     neighbouringPts (x, y) = 
       [(x + dx, y + dy) | dx <- [-1..1], dy <- [-1..1], dx /= dy || dx > 0]
@@ -79,9 +79,7 @@ board2Matrix board = [[cell (x, y) | x <- xCoords] | y <- yCoords]
 
 matrix2Board :: [[Char]] -> Board
 matrix2Board m = 
-  makeBoard . map toPoint . filter isLive $ zip (concat m) allPoints
-  where toPoint (_, p) = p
-        isLive (c, _) = c == 'X'
+  makeBoard . map snd . filter ((==) 'X' . fst) $ zip (concat m) allPoints
 
 printBoard :: Board -> IO ()
 printBoard board = mapM_ putStrLn $ board2Matrix board
@@ -109,7 +107,7 @@ printCurses startBoard = do
       showStr line
       wMove stdScr (y + 1) 5
 
-    wait = threadDelay (5 * 100000)
+    wait = threadDelay (2 * 100000)
 --    wait = getCh
 
     showStr str = do
