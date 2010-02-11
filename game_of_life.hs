@@ -1,6 +1,7 @@
 {-# LANGUAGE BangPatterns #-}
 
 import Prelude hiding (null)
+import Control.Monad (forM_)
 import Data.Set (Set, member, fromList, null, empty)
 import Foreign.C.String (newCString)
 import Foreign.Marshal.Alloc (free)
@@ -85,20 +86,20 @@ printBoard :: Board -> IO ()
 printBoard board = mapM_ putStrLn $ board2Matrix board
 
 printGames :: Board -> IO ()
-printGames board = mapM_ printFrame $ games board
+printGames board = forM_ (games board) printFrame
     where 
-      printFrame b = do
-        printBoard b
+      printFrame board = do
+        printBoard board
         putStrLn $ replicate boardWidth '*'
 
 printCurses :: Board -> IO ()
 printCurses startBoard = do
   resetParams
-  mapM_ showFrame $ games startBoard
+  forM_ (games startBoard) showFrame
   where 
     showFrame board = do
       wMove stdScr 2 5
-      mapM_ showLine (board2Matrix board)
+      forM_ (board2Matrix board) showLine
       refresh
       wait
 
