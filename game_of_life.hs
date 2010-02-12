@@ -2,7 +2,9 @@
 
 import Prelude hiding (null)
 import Control.Monad (forM_)
+import Data.Maybe
 import Data.Set (Set, member, fromList, null, empty)
+import System.Environment (getArgs)
 import Foreign.C.String (newCString)
 import Foreign.Marshal.Alloc (free)
 import Control.Concurrent (threadDelay)
@@ -149,8 +151,26 @@ boardOscillators2 =
                 "          "]
 
 
-main :: IO ()
+boards = [("oscillators1", boardOscillators), 
+          ("oscillators2", boardOscillators2),
+          ("gliders", boardGliders),
+          ("board1", board1),
+          ("queenBee", boardQueenBee)]
+
 main = do
-  initCurses (return ())
-  printCurses boardQueenBee
-  endWin
+  args <- getArgs
+  
+  case lookup (head args) boards of
+    Just board -> runBoard board
+    Nothing    -> showHelp (head args)
+  
+  where 
+    runBoard board = do
+      initCurses (return ())
+      printCurses board
+      endWin
+
+    showHelp name = do
+      putStrLn $ "No board called " ++ name
+      putStr "Boards: "
+      putStrLn . show . map fst $ boards
