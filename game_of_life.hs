@@ -158,11 +158,11 @@ boards = [("oscillators1", boardOscillators),
           ("queenBee", boardQueenBee)]
 
 main = do
-  args <- getArgs
-  
-  case lookup (head args) boards of
+  [name] <- getArgs
+
+  case lookup name boards of
     Just board -> runBoard board
-    Nothing    -> showHelp (head args)
+    Nothing    -> showHelp name
   
   where 
     runBoard board = do
