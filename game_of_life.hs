@@ -24,22 +24,27 @@ yCoords = [0..boardHeight - 1]
 makeBoard :: [Point] -> Board
 makeBoard points = fromList points
 
-allPoints :: Board -> [Point]
-allPoints board = [(x, y) | y <- [minY..maxY], x <- [minX..maxX]]
-  where (minX, minY, maxX, maxY) = bounds board
+allPoints :: Bounds -> [Point]
+allPoints (minX, minY, maxX, maxY) = 
+  [(x, y) | y <- [minY..maxY], x <- [minX..maxX]]
 
-bounds:: Board -> Bounds
+bounds :: Board -> Bounds
 bounds board = 
   foldr maxMin (maxBound, maxBound, minBound, minBound) $ toList board
   where maxMin (x, y) (tx, ty, bx, by) =
           (min x bx, min y by, max x bx, max y by)
 
+grow :: Bounds -> Bounds
+grow (tx, ty, bx, by) = (tx - 1, ty - 1, bx + 1, by + 1)
+
 isCellLive :: Board -> Point -> Bool
 isCellLive board point = point `member` board
 
 nextBoard :: Board -> Board
-nextBoard board = makeBoard [point | point <- allPoints board, succIsLive point]
+nextBoard board = makeBoard [point | point <- points, succIsLive point]
   where
+    points = allPoints . grow . bounds $ board
+
     succIsLive point = nextCell (isLive point) (liveNeighbours point)
 
     liveNeighbours point = 
