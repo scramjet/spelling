@@ -3,7 +3,7 @@
 import Prelude hiding (null)
 import Control.Monad (forM_)
 import Data.Maybe
-import Data.Set (Set, member, fromList, null, empty)
+import Data.Set (Set, member, fromList, null, empty, toList)
 import System.Environment (getArgs)
 import Foreign.C.String (newCString)
 import Foreign.Marshal.Alloc (free)
@@ -13,6 +13,7 @@ import UI.Nanocurses.Curses (initCurses, refresh, wMove, stdScr,
 
 type Point = (Int, Int)
 type Board = Set Point
+type Bounds = (Int, Int, Int, Int)
 
 boardWidth  = 10
 boardHeight = 10
@@ -20,17 +21,24 @@ boardHeight = 10
 xCoords = [0..boardWidth - 1]
 yCoords = [0..boardHeight - 1]
 
-allPoints :: [Point]
-allPoints = [(x, y) | y <- yCoords, x <- xCoords]
-
 makeBoard :: [Point] -> Board
 makeBoard points = fromList points
+
+allPoints :: Board -> [Point]
+allPoints board = [(x, y) | y <- [minY..maxY], x <- [minX..maxX]]
+  where (minX, minY, maxX, maxY) = bounds board
+
+bounds:: Board -> Bounds
+bounds board = 
+  foldr maxMin (maxBound, maxBound, minBound, minBound) $ toList board
+  where maxMin (x, y) (tx, ty, bx, by) =
+          (min x bx, min y by, max x bx, max y by)
 
 isCellLive :: Board -> Point -> Bool
 isCellLive board point = point `member` board
 
 nextBoard :: Board -> Board
-nextBoard board = makeBoard [point | point <- allPoints, succIsLive point]
+nextBoard board = makeBoard [point | point <- allPoints board, succIsLive point]
   where
     succIsLive point = nextCell (isLive point) (liveNeighbours point)
 
@@ -61,15 +69,12 @@ matrix2Board :: [[Char]] -> Board
 matrix2Board rows = 
   makeBoard . livePoints . concat $ rowsWithPoints rows 0
   where
-    rowsWithPoints :: [[Char]] -> Int -> [[(Char, Point)]]
     rowsWithPoints [] _ = []
     rowsWithPoints (row:rows) y  = 
       (rowWithPoints row y) : rowsWithPoints rows (y + 1)
 
-    rowWithPoints :: [Char] -> Int -> [(Char, Point)]
     rowWithPoints row y = zipWith (\c x -> (c, (x, y))) row [0..]
 
-    livePoints :: [(Char, Point)] -> [Point]
     livePoints = map snd . filter ((==) 'X' . fst)
 
 printBoard :: Board -> IO ()
