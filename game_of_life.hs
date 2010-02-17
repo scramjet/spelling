@@ -15,12 +15,6 @@ type Point = (Int, Int)
 type Board = Set Point
 type Bounds = (Int, Int, Int, Int)
 
-boardWidth  = 10
-boardHeight = 10
-
-xCoords = [0..boardWidth - 1]
-yCoords = [0..boardHeight - 1]
-
 makeBoard :: [Point] -> Board
 makeBoard points = fromList points
 
@@ -67,8 +61,10 @@ games board | null board = []
             | otherwise = board : games (nextBoard board)
 
 board2Matrix :: Board -> [[Char]]
-board2Matrix board = [[cell (x, y) | x <- xCoords] | y <- yCoords]
-  where cell p = if isCellLive board p then 'X' else ' '
+board2Matrix board = [[cell (x, y) | x <- [minX..maxX]] | y <- [minY..maxY]]
+  where 
+    cell p = if isCellLive board p then 'X' else ' '
+    (minX, minY, maxX, maxY) = bounds board
 
 matrix2Board :: [[Char]] -> Board
 matrix2Board rows = 
@@ -89,8 +85,9 @@ printConsole :: [Board] -> IO ()
 printConsole boards = forM_ boards printFrame
   where printFrame board = do
           printBoard board
-          putStrLn $ replicate boardWidth '*'
+          putStrLn $ replicate 10 '*'
 
+-- TODO display board offset correctly
 printCurses :: [Board] -> IO ()
 printCurses boards = do
   forM_ boards showFrame
