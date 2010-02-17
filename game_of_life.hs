@@ -58,8 +58,19 @@ board2Matrix board = [[cell (x, y) | x <- xCoords] | y <- yCoords]
   where cell p = if isCellLive board p then 'X' else ' '
 
 matrix2Board :: [[Char]] -> Board
-matrix2Board m = 
-  makeBoard . map snd . filter ((==) 'X' . fst) $ zip (concat m) allPoints
+matrix2Board rows = 
+  makeBoard . livePoints . concat $ addPoints rows 0
+  where
+    addPoints :: [[Char]] -> Int -> [[(Char, Point)]]
+    addPoints [] _ = []
+    addPoints (row:rows) y  = (rowWithPoints row y) : addPoints rows (y + 1)
+
+    livePoints :: [(Char, Point)] -> [Point]
+    livePoints = map snd . filter ((==) 'X' . fst)
+
+    rowWithPoints :: [Char] -> Int -> [(Char, Point)]
+    rowWithPoints row y = zipWith merge row [0..]
+      where merge c x = (c, (x, y))
 
 printBoard :: Board -> IO ()
 printBoard board = mapM_ putStrLn $ board2Matrix board
