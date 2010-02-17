@@ -130,9 +130,7 @@ boardOscillators =
                 "          ",
                 "          ",
                 "    XXX   ",
-                "  XXX     ",
-                "          ",
-                "          "]
+                "  XXX     "]
 
 boardGliders = 
   matrix2Board ["X         ",
@@ -141,10 +139,7 @@ boardGliders =
                 "          ",
                 " X        ",
                 " XX       ",
-                "X X       ",
-                "          ",
-                "          ",
-                "          "]
+                "X X       "]
 
 boardQueenBee = 
   matrix2Board ["          ",
@@ -154,9 +149,8 @@ boardQueenBee =
                 "   X      ",
                 "   X      ",
                 "  X       ",
-                "XX        ",
-                "          ",
-                "          "]
+                "XX        "]
+
 boardOscillators2 = 
   matrix2Board ["          ",
                 "XXXXXXXXXX",
@@ -166,9 +160,7 @@ boardOscillators2 =
                 "   XXX    ",
                 "   X X    ",
                 "   XXX    ",
-                "    X     ",
-                "          "]
-
+                "    X     "]
 
 standardBoards = 
   [("oscillators1", boardOscillators), 
