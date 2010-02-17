@@ -32,8 +32,7 @@ isCellLive board point = point `member` board
 nextBoard :: Board -> Board
 nextBoard board = makeBoard [point | point <- allPoints, succIsLive point]
   where
-    succIsLive point = 
-      nextCell (isLive point) (liveNeighbours point)
+    succIsLive point = nextCell (isLive point) (liveNeighbours point)
 
     liveNeighbours point = 
       length . filter id . map isLive . neighbouringPts $ point
@@ -65,15 +64,15 @@ matrix2Board m =
 printBoard :: Board -> IO ()
 printBoard board = mapM_ putStrLn $ board2Matrix board
 
-printGames :: Board -> IO ()
-printGames board = forM_ (games board) printFrame
+printConsole :: [Board] -> IO ()
+printConsole boards = forM_ boards printFrame
   where printFrame board = do
           printBoard board
           putStrLn $ replicate boardWidth '*'
 
-printCurses :: Board -> IO ()
-printCurses startBoard = do
-  forM_ (games startBoard) showFrame
+printCurses :: [Board] -> IO ()
+printCurses boards = do
+  forM_ boards showFrame
   where 
     showFrame board = do
       wMove stdScr 2 5
@@ -88,7 +87,7 @@ printCurses startBoard = do
 
     showStr str = do
       cStr <- newCString str
-      waddnstr stdScr cStr (fromIntegral $ length str)
+      waddnstr stdScr cStr (fromIntegral . length $ str)
       free cStr
 
     wait = threadDelay (2 * 100000) -- or getCh
@@ -153,26 +152,27 @@ boardOscillators2 =
                 "          "]
 
 
-boards = [("oscillators1", boardOscillators), 
-          ("oscillators2", boardOscillators2),
-          ("gliders", boardGliders),
-          ("board1", board1),
-          ("queenBee", boardQueenBee)]
+standardBoards = 
+  [("oscillators1", boardOscillators), 
+   ("oscillators2",boardOscillators2), 
+   ("gliders", boardGliders),
+   ("board1", board1), 
+   ("queenBee", boardQueenBee)]
 
 main = do
   [name] <- getArgs
 
-  case lookup name boards of
+  case lookup name standardBoards of
     Just board -> runBoard board
     Nothing    -> showHelp name
   
   where 
     runBoard board = do
       initCurses (return ())
-      printCurses board
+      printCurses (games board)
       endWin
 
     showHelp name = do
       putStrLn $ "No board called " ++ name
       putStr "Boards: "
-      putStrLn . show . map fst $ boards
+      putStrLn . show . map fst $ standardBoards
