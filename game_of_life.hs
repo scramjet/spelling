@@ -59,18 +59,18 @@ board2Matrix board = [[cell (x, y) | x <- xCoords] | y <- yCoords]
 
 matrix2Board :: [[Char]] -> Board
 matrix2Board rows = 
-  makeBoard . livePoints . concat $ addPoints rows 0
+  makeBoard . livePoints . concat $ rowsWithPoints rows 0
   where
-    addPoints :: [[Char]] -> Int -> [[(Char, Point)]]
-    addPoints [] _ = []
-    addPoints (row:rows) y  = (rowWithPoints row y) : addPoints rows (y + 1)
+    rowsWithPoints :: [[Char]] -> Int -> [[(Char, Point)]]
+    rowsWithPoints [] _ = []
+    rowsWithPoints (row:rows) y  = 
+      (rowWithPoints row y) : rowsWithPoints rows (y + 1)
+
+    rowWithPoints :: [Char] -> Int -> [(Char, Point)]
+    rowWithPoints row y = zipWith (\c x -> (c, (x, y))) row [0..]
 
     livePoints :: [(Char, Point)] -> [Point]
     livePoints = map snd . filter ((==) 'X' . fst)
-
-    rowWithPoints :: [Char] -> Int -> [(Char, Point)]
-    rowWithPoints row y = zipWith merge row [0..]
-      where merge c x = (c, (x, y))
 
 printBoard :: Board -> IO ()
 printBoard board = mapM_ putStrLn $ board2Matrix board
