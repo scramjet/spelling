@@ -27,7 +27,7 @@ bounds :: Board -> Bounds
 bounds board = 
   foldr maxMin (maxBound, maxBound, minBound, minBound) $ toList board
   where maxMin (x, y) (tx, ty, bx, by) =
-          (min x bx, min y by, max x bx, max y by)
+          (min x tx, min y ty, max x bx, max y by)
 
 grow :: Bounds -> Bounds
 grow (tx, ty, bx, by) = (tx - 1, ty - 1, bx + 1, by + 1)
@@ -99,7 +99,6 @@ printCurses boards = do
       forM_ (board2Matrix board (0, 0, scrWidth, scrHeight - 2)) showLine
       refresh
       wait
-
     showLine line = do
       (y, x) <- getYX stdScr
       showStr line
@@ -149,13 +148,13 @@ standardBoards =
       "X X X   X "]), 
    ("queenBee", matrix2Board 
      ["     ",
-      "XX   ",
-      "  X  ",
-      "   X ",
-      "   X ",
-      "   X ",
-      "  X  ",
-      "XX   "])]
+      "  XX   ",
+      "    X  ",
+      "     X ",
+      "     X ",
+      "     X ",
+      "    X  ",
+      "  XX   "])]
 
 main = do
   [name] <- getArgs
