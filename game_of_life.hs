@@ -9,7 +9,8 @@ import Foreign.C.String (newCString)
 import Foreign.Marshal.Alloc (free)
 import Control.Concurrent (threadDelay)
 import UI.Nanocurses.Curses (initCurses, refresh, wMove, stdScr, 
-                             waddnstr, getYX, endWin, resetParams, getCh)
+                             waddnstr, getYX, endWin, resetParams, 
+                             getCh, scrSize)
 
 type Point = (Int, Int)
 type Board = Set Point
@@ -89,18 +90,20 @@ printConsole boards = forM_ boards printFrame
 
 printCurses :: [Board] -> IO ()
 printCurses boards = do
-  forM_ boards showFrame
+  (scrHeight, scrWidth) <- scrSize
+  forM_ boards (showFrame scrWidth scrHeight)
   where 
-    showFrame board = do
-      wMove stdScr yOffset xOffset
-      forM_ (board2Matrix board boardBounds) showLine
+    showFrame scrWidth scrHeight board = do
+      wMove stdScr 0 0
+      -- without scrWidth-2 we get a "wmove" error, no idea why
+      forM_ (board2Matrix board (0, 0, scrWidth, scrHeight - 2)) showLine
       refresh
       wait
 
     showLine line = do
       (y, x) <- getYX stdScr
       showStr line
-      wMove stdScr (y + 1) xOffset
+      wMove stdScr (y + 1) 0
 
     showStr str = do
       cStr <- newCString str
@@ -108,8 +111,6 @@ printCurses boards = do
       free cStr
 
     wait = threadDelay (2 * 100000) -- or getCh
-
-    boardBounds@(yOffset, xOffset, _, _) = (0, 0, 80, 30)
 
 standardBoards = 
   [("oscillators1", matrix2Board 
