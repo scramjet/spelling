@@ -60,11 +60,11 @@ games :: Board -> [Board]
 games board | null board = []
             | otherwise = board : games (nextBoard board)
 
-board2Matrix :: Board -> [[Char]]
-board2Matrix board = [[cell (x, y) | x <- [minX..maxX]] | y <- [minY..maxY]]
+board2Matrix :: Board -> Bounds -> [[Char]]
+board2Matrix board (minX, minY, maxX, maxY) = 
+  [[cell (x, y) | x <- [minX..maxX]] | y <- [minY..maxY]]
   where 
     cell p = if isCellLive board p then 'X' else ' '
-    (minX, minY, maxX, maxY) = bounds board
 
 matrix2Board :: [[Char]] -> Board
 matrix2Board rows = 
@@ -79,7 +79,7 @@ matrix2Board rows =
     livePoints = map snd . filter ((==) 'X' . fst)
 
 printBoard :: Board -> IO ()
-printBoard board = mapM_ putStrLn $ board2Matrix board
+printBoard board = mapM_ putStrLn $ board2Matrix board (bounds board)
 
 printConsole :: [Board] -> IO ()
 printConsole boards = forM_ boards printFrame
@@ -87,21 +87,20 @@ printConsole boards = forM_ boards printFrame
           printBoard board
           putStrLn $ replicate 10 '*'
 
--- TODO display board offset correctly
 printCurses :: [Board] -> IO ()
 printCurses boards = do
   forM_ boards showFrame
   where 
     showFrame board = do
-      wMove stdScr 2 5
-      forM_ (board2Matrix board) showLine
+      wMove stdScr yOffset xOffset
+      forM_ (board2Matrix board boardBounds) showLine
       refresh
       wait
 
     showLine line = do
       (y, x) <- getYX stdScr
       showStr line
-      wMove stdScr (y + 1) 5
+      wMove stdScr (y + 1) xOffset
 
     showStr str = do
       cStr <- newCString str
@@ -110,64 +109,52 @@ printCurses boards = do
 
     wait = threadDelay (2 * 100000) -- or getCh
 
-board1 = 
-  matrix2Board ["X XX X XXX",
-                "X X X X X ",
-                "X X   X X ",
-                "X X X X X ",
-                "X X X  XX ",
-                "X XX    X ",
-                "X X X   X ",
-                "X   X X X ",
-                "X X   X X ",
-                "X X X   X "]
-
-boardOscillators = 
-  matrix2Board [" X        ",
-                " X        ",
-                " X        ",
-                "          ",
-                "          ",
-                "          ",
-                "    XXX   ",
-                "  XXX     "]
-
-boardGliders = 
-  matrix2Board ["X         ",
-                " XX       ",
-                "XX        ",
-                "          ",
-                " X        ",
-                " XX       ",
-                "X X       "]
-
-boardQueenBee = 
-  matrix2Board ["          ",
-                "XX        ",
-                "  X       ",
-                "   X      ",
-                "   X      ",
-                "   X      ",
-                "  X       ",
-                "XX        "]
-
-boardOscillators2 = 
-  matrix2Board ["          ",
-                "XXXXXXXXXX",
-                "          ",
-                "          ",
-                "    X     ",
-                "   XXX    ",
-                "   X X    ",
-                "   XXX    ",
-                "    X     "]
+    boardBounds@(yOffset, xOffset, _, _) = (0, 0, 80, 30)
 
 standardBoards = 
-  [("oscillators1", boardOscillators), 
-   ("oscillators2",boardOscillators2), 
-   ("gliders", boardGliders),
-   ("board1", board1), 
-   ("queenBee", boardQueenBee)]
+  [("oscillators1", matrix2Board 
+     [" X        ",
+      " X        ",
+      " X        ",
+      "          ",
+      "          ",
+      "          ",
+      "    XXX   ",
+      "  XXX     "]), 
+   ("oscillators2", matrix2Board 
+     ["          ",
+      "XXXXXXXXXX",
+      "          ",
+      "          ",
+      "    X     ",
+      "   XXX    ",
+      "   X X    ",
+      "   XXX    ",
+      "    X     "]), 
+   ("glider", matrix2Board
+     ["X  ",
+      " XX",
+      "XX "]),
+   ("board1", matrix2Board 
+     ["X XX X XXX",
+      "X X X X X ",
+      "X X   X X ",
+      "X X X X X ",
+      "X X X  XX ",
+      "X XX    X ",
+      "X X X   X ",
+      "X   X X X ",
+      "X X   X X ",
+      "X X X   X "]), 
+   ("queenBee", matrix2Board 
+     ["     ",
+      "XX   ",
+      "  X  ",
+      "   X ",
+      "   X ",
+      "   X ",
+      "  X  ",
+      "XX   "])]
 
 main = do
   [name] <- getArgs
