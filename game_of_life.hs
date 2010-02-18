@@ -90,15 +90,15 @@ printConsole boards = forM_ boards printFrame
 
 printCurses :: [Board] -> IO ()
 printCurses boards = do
-  (scrHeight, scrWidth) <- scrSize
+  (scrHeight + 2, scrWidth) <- scrSize
   forM_ boards (showFrame scrWidth scrHeight)
   where 
     showFrame scrWidth scrHeight board = do
       wMove stdScr 0 0
-      -- without scrWidth-2 we get a "wmove" error, no idea why
-      forM_ (board2Matrix board (0, 0, scrWidth, scrHeight - 2)) showLine
+      forM_ (board2Matrix board (rect scrWidth scrHeight)) showLine
       refresh
       wait
+
     showLine line = do
       (y, x) <- getYX stdScr
       showStr line
@@ -110,6 +110,9 @@ printCurses boards = do
       free cStr
 
     wait = threadDelay (2 * 100000) -- or getCh
+    
+    rect :: Int -> Int -> Bounds
+    rect w h = (-w `div` 3, -h `div` 3, w - w `div` 3, h - h `div` 3)
 
 standardBoards = 
   [("oscillators1", matrix2Board 
