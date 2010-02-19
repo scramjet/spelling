@@ -16,6 +16,12 @@ type Point = (Int, Int)
 type Board = Set Point
 type Bounds = (Int, Int, Int, Int)
 
+translate :: Bounds -> Int -> Int -> Bounds
+translate (tx, ty, bx, by) dx dy = (tx + dx, ty + dy, bx + dx, by + dy)
+
+makeRect :: Int -> Int -> Bounds
+makeRect width height = (0, 0, width, height)
+
 makeBoard :: [Point] -> Board
 makeBoard points = fromList points
 
@@ -94,8 +100,11 @@ printCurses boards = do
   forM_ boards (showFrame scrWidth scrHeight)
   where 
     showFrame scrWidth scrHeight board = do
+      let displayRect = 
+            translate (makeRect scrWidth scrHeight) 
+              (-scrWidth `div` 3) (-scrHeight `div` 3)
       wMove stdScr 0 0
-      forM_ (board2Matrix board (rect scrWidth scrHeight)) showLine
+      forM_ (board2Matrix board displayRect) showLine
       refresh
       wait
 
@@ -110,9 +119,7 @@ printCurses boards = do
       free cStr
 
     wait = threadDelay (2 * 100000) -- or getCh
-    
-    rect :: Int -> Int -> Bounds
-    rect w h = (-w `div` 3, -h `div` 3, w - w `div` 3, h - h `div` 3)
+
 
 standardBoards = 
   [("oscillators1", matrix2Board 
