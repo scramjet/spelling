@@ -16,11 +16,14 @@ type Point = (Int, Int)
 type Board = Set Point
 type Bounds = (Int, Int, Int, Int)
 
+makeRect :: Int -> Int -> Bounds
+makeRect width height = (0, 0, width, height)
+
 translate :: Bounds -> Int -> Int -> Bounds
 translate (tx, ty, bx, by) dx dy = (tx + dx, ty + dy, bx + dx, by + dy)
 
-makeRect :: Int -> Int -> Bounds
-makeRect width height = (0, 0, width, height)
+grow :: Bounds -> Bounds
+grow (tx, ty, bx, by) = (tx - 1, ty - 1, bx + 1, by + 1)
 
 makeBoard :: [Point] -> Board
 makeBoard points = fromList points
@@ -35,8 +38,23 @@ bounds board =
   where maxMin (x, y) (tx, ty, bx, by) =
           (min x tx, min y ty, max x bx, max y by)
 
-grow :: Bounds -> Bounds
-grow (tx, ty, bx, by) = (tx - 1, ty - 1, bx + 1, by + 1)
+board2Matrix :: Board -> Bounds -> [[Char]]
+board2Matrix board (minX, minY, maxX, maxY) = 
+  [[cell (x, y) | x <- [minX..maxX]] | y <- [minY..maxY]]
+  where 
+    cell p = if isCellLive board p then 'X' else ' '
+
+matrix2Board :: [[Char]] -> Board
+matrix2Board rows = 
+  makeBoard . livePoints . concat $ rowsWithPoints rows 0
+  where
+    rowsWithPoints [] _ = []
+    rowsWithPoints (row:rows) y  = 
+      (rowWithPoints row y) : rowsWithPoints rows (y + 1)
+
+    rowWithPoints row y = zipWith (\c x -> (c, (x, y))) row [0..]
+
+    livePoints = map snd . filter ((==) 'X' . fst)
 
 isCellLive :: Board -> Point -> Bool
 isCellLive board point = point `member` board
@@ -66,24 +84,6 @@ nextCell False neighbours | neighbours == 3 = True
 games :: Board -> [Board]
 games board | null board = []
             | otherwise = board : games (nextBoard board)
-
-board2Matrix :: Board -> Bounds -> [[Char]]
-board2Matrix board (minX, minY, maxX, maxY) = 
-  [[cell (x, y) | x <- [minX..maxX]] | y <- [minY..maxY]]
-  where 
-    cell p = if isCellLive board p then 'X' else ' '
-
-matrix2Board :: [[Char]] -> Board
-matrix2Board rows = 
-  makeBoard . livePoints . concat $ rowsWithPoints rows 0
-  where
-    rowsWithPoints [] _ = []
-    rowsWithPoints (row:rows) y  = 
-      (rowWithPoints row y) : rowsWithPoints rows (y + 1)
-
-    rowWithPoints row y = zipWith (\c x -> (c, (x, y))) row [0..]
-
-    livePoints = map snd . filter ((==) 'X' . fst)
 
 printBoard :: Board -> IO ()
 printBoard board = mapM_ putStrLn $ board2Matrix board (bounds board)
@@ -119,7 +119,6 @@ printCurses boards = do
       free cStr
 
     wait = threadDelay (2 * 100000) -- or getCh
-
 
 standardBoards = 
   [("oscillators1", matrix2Board 
